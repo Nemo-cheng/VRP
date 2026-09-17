@@ -1,0 +1,25 @@
+# 企业数据与 Office 临时文件
+订单数据.xlsx
+~$*.xlsx
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+.venv/
+
+# 实验生成文件
+experiment/instances/
+results/raw/
+results/logs/
+
+# 当前统一实验未使用的公开算例
+external_data/e-cvrp_benchmark_instances/
+external_data/EVRP-TW-SPD-HMA/data/akb_instances/
+external_data/EVRP-TW-SPD-HMA/data/jd_instances/*
+!external_data/EVRP-TW-SPD-HMA/data/jd_instances/jd200_1.txt
+external_data/EVRP-TW-SPD-HMA/solution/akb/
+external_data/EVRP-TW-SPD-HMA/solution/jd/
+
+# 本地工具文件
+.DS_Store
+Thumbs.db

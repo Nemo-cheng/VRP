@@ -1,0 +1,4 @@
+﻿model,route_count,total_cost,total_distance,distance_check_difference,total_travel_time,total_waiting_time,total_charging_time,station_passes,charging_visits,total_energy,minimum_remaining_range,minimum_battery_energy,customer_coverage,capacity_feasible,time_windows_feasible,battery_feasible,solver_model_feasible,full_model_feasible,solver_seconds,solution_file
+vrp_spd,12,24406.98,1486213.0,0.1429,3030.0,700.0,0.0,6,0,371.55325,-98807.0,-24.70175,1.0,True,,,True,,40.02,results\raw\jd200_1_vrp_spd_timelimit=30_subproblem=2.txt
+vrp_tw_spd,47,77000.21,4492872.0,-0.1429,6573.0,227.0,0.0,10,0,1123.218,-29199.0,-7.29975,1.0,True,True,,True,,32.34,results\raw\jd200_1_vrp_tw_spd_timelimit=30_subproblem=2.txt
+evrp_tw_spd,49,76360.9,4404350.0,0.0,7003.0,381.3942,20.589,26,8,1101.0875,0.0,0.0,1.0,True,True,True,True,True,30.88,results\raw\jd200_1_evrp_tw_spd_timelimit=30_subproblem=2.txt

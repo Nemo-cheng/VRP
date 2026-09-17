@@ -1,0 +1,17 @@
+FROM docker.m.daocloud.io/library/gcc:13-bookworm
+
+COPY src /src
+
+RUN g++ -std=c++11 -O3 \
+    -o /usr/local/bin/evrp-tw-spd \
+    /src/evrp_tw_spd_solver.cpp \
+    /src/eval.cpp \
+    /src/operator.cpp \
+    /src/search_framework.cpp \
+    /src/solution.cpp \
+    /src/util.cpp \
+    /src/data.cpp \
+    /src/evolution.cpp \
+    && rm -rf /src
+
+ENTRYPOINT ["/usr/local/bin/evrp-tw-spd"]
