@@ -213,21 +213,33 @@ def write_summary_markdown(
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_outputs(rows: list[dict[str, object]], seeds: list[int], time_limit: int) -> None:
-    results_dir = ROOT / "results"
-    results_dir.mkdir(exist_ok=True)
+def write_output_set(
+    output_dir: Path,
+    rows: list[dict[str, object]],
+    seeds: list[int],
+    time_limit: int,
+) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
     deltas = paired_deltas(rows)
     summary = model_summary(rows)
-    write_csv(results_dir / "batch_metrics.csv", rows)
-    write_csv(results_dir / "batch_paired_deltas.csv", deltas)
-    (results_dir / "batch_metrics.json").write_text(
+    write_csv(output_dir / "batch_metrics.csv", rows)
+    write_csv(output_dir / "batch_paired_deltas.csv", deltas)
+    (output_dir / "batch_metrics.json").write_text(
         json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    (results_dir / "batch_summary.json").write_text(
+    (output_dir / "batch_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     write_summary_markdown(
-        results_dir / "batch_summary.md", summary, deltas, seeds, time_limit
+        output_dir / "batch_summary.md", summary, deltas, seeds, time_limit
+    )
+
+
+def write_outputs(rows: list[dict[str, object]], seeds: list[int], time_limit: int) -> None:
+    results_dir = ROOT / "results"
+    write_output_set(results_dir, rows, seeds, time_limit)
+    write_output_set(
+        results_dir / "batches" / f"time_{time_limit}", rows, seeds, time_limit
     )
 
 
