@@ -4,6 +4,7 @@ import csv
 import json
 import math
 import re
+from collections import Counter
 from pathlib import Path
 
 from run_unified_experiment import Instance, parse_instance
@@ -59,22 +60,33 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
     charging_visits = 0
     station_passes = 0
     minimum_range = max_range
-    served_customers: set[int] = set()
+    customer_visits: Counter[int] = Counter()
     capacity_feasible = True
     time_feasible = True
     battery_feasible = True
+    route_structure_feasible = True
 
     for route in routes:
+        route_structure_feasible &= (
+            len(route) >= 2
+            and route[0][0] == instance.depot
+            and route[-1][0] == instance.depot
+        )
         route_customers = [
             node_id
             for node_id, _, _ in route
             if instance.nodes[node_id]["type"] == "c"
         ]
-        served_customers.update(route_customers)
+        customer_visits.update(route_customers)
         load = sum(float(instance.nodes[node_id]["delivery"]) for node_id in route_customers)
         capacity_feasible &= load <= capacity + 1e-3
         current_time = float(instance.nodes[instance.depot]["ready"])
         remaining_range = max_range
+
+        start_arrival, start_departure = route[0][1], route[0][2]
+        if model == "evrp_tw_spd" and start_arrival is not None and start_departure is not None:
+            battery_feasible &= abs(start_arrival - max_range) <= 1e-2
+            battery_feasible &= abs(start_departure - max_range) <= 1e-2
 
         for index in range(1, len(route)):
             previous = route[index - 1][0]
@@ -89,6 +101,9 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
             minimum_range = min(minimum_range, remaining_range)
             battery_feasible &= remaining_range >= -1e-2
 
+            if model == "evrp_tw_spd" and arrival_range is not None:
+                battery_feasible &= abs(arrival_range - remaining_range) <= 1e-2
+
             node = instance.nodes[node_id]
             time_feasible &= current_time <= float(node["due"]) + 1e-2
             if current_time < float(node["ready"]):
@@ -99,6 +114,8 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
             if node["type"] == "f":
                 station_passes += 1
                 if arrival_range is not None and departure_range is not None:
+                    battery_feasible &= departure_range + 1e-2 >= arrival_range
+                    battery_feasible &= departure_range <= max_range + 1e-2
                     charged_range = max(0.0, departure_range - arrival_range)
                     if charged_range > 1e-2:
                         charging_visits += 1
@@ -116,7 +133,16 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
     expected_customers = {
         node_id for node_id, node in instance.nodes.items() if node["type"] == "c"
     }
-    coverage = len(served_customers) / len(expected_customers)
+    served_customers = set(customer_visits)
+    coverage = len(served_customers & expected_customers) / len(expected_customers)
+    unexpected_customer_visits = set(customer_visits) - expected_customers
+    duplicate_customer_visits = sum(
+        max(0, visits - 1) for visits in customer_visits.values()
+    )
+    customers_served_once = (
+        not unexpected_customer_visits
+        and all(customer_visits[node_id] == 1 for node_id in expected_customers)
+    )
     solver_distance = (total_cost - dispatch_cost * len(routes)) / unit_cost
     distance_difference = total_distance - solver_distance
     full_model_feasible: bool | None = None
@@ -125,7 +151,8 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
             capacity_feasible
             and time_feasible
             and battery_feasible
-            and coverage == 1.0
+            and customers_served_once
+            and route_structure_feasible
         )
 
     return {
@@ -143,6 +170,9 @@ def evaluate(model: str, solution_path: Path, instance: Instance) -> dict[str, o
         "minimum_remaining_range": round(minimum_range, 4),
         "minimum_battery_energy": round(minimum_range * consumption, 6),
         "customer_coverage": round(coverage, 6),
+        "customers_served_once": customers_served_once,
+        "duplicate_customer_visits": duplicate_customer_visits,
+        "route_structure_feasible": route_structure_feasible,
         "capacity_feasible": capacity_feasible,
         "time_windows_feasible": time_feasible if model != "vrp_spd" else None,
         "battery_feasible": battery_feasible if model == "evrp_tw_spd" else None,
