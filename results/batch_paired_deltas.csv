@@ -1,0 +1,7 @@
+﻿seed,comparison,baseline_model,current_model,route_count_change_pct,total_cost_change_pct,total_distance_change_pct,total_travel_time_change_pct,total_waiting_time_change_pct,charging_visits_change_pct,total_charging_time_change_pct,total_energy_change_pct
+42,time_window_effect,vrp_spd,vrp_tw_spd,283.3333,216.3468,204.4001,117.3271,-57.7027,0.0,0.0,204.4001
+42,battery_charging_effect,vrp_tw_spd,evrp_tw_spd,2.1739,-1.3615,-2.1556,6.8603,-40.0383,0.0,0.0,-2.1556
+43,time_window_effect,vrp_spd,vrp_tw_spd,291.6667,203.3639,188.2927,109.9707,-83.1528,0.0,0.0,188.2927
+43,battery_charging_effect,vrp_tw_spd,evrp_tw_spd,2.1277,0.306,-0.1164,5.8349,113.3429,0.0,0.0,-0.1164
+44,time_window_effect,vrp_spd,vrp_tw_spd,318.1818,221.4833,205.6243,123.2368,-59.4595,0.0,0.0,205.6243
+44,battery_charging_effect,vrp_tw_spd,evrp_tw_spd,0.0,-3.0248,-3.7036,1.9383,-2.381,0.0,0.0,-3.7036
