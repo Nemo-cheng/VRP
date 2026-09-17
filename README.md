@@ -16,3 +16,17 @@ uv run python experiment/run.py --skip-build --time-limit 30
 ```
 
 首次运行或需要重建求解器镜像时，去掉 `--skip-build`。
+
+正式实验结果：
+
+```text
+results/正式实验结果解读.md
+results/batch_summary.md
+results/figures/
+```
+
+重新生成分析图：
+
+```powershell
+uv run python experiment/analyze_results.py
+```
