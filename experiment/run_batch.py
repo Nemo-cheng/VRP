@@ -161,7 +161,7 @@ def write_summary_markdown(
     time_limit: int,
 ) -> None:
     lines = [
-        "# 批量预实验汇总",
+        "# 批量实验汇总",
         "",
         f"随机种子：{', '.join(str(seed) for seed in seeds)}",
         "",
