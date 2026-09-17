@@ -6,6 +6,7 @@ import json
 import statistics
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from evaluate_results import evaluate
@@ -238,9 +239,11 @@ def write_output_set(
 def write_outputs(rows: list[dict[str, object]], seeds: list[int], time_limit: int) -> None:
     results_dir = ROOT / "results"
     write_output_set(results_dir, rows, seeds, time_limit)
-    write_output_set(
-        results_dir / "batches" / f"time_{time_limit}", rows, seeds, time_limit
+    seed_set = "-".join(str(seed) for seed in seeds)
+    archive_dir = (
+        results_dir / "batches" / f"time_{time_limit}" / f"seeds_{seed_set}"
     )
+    write_output_set(archive_dir, rows, seeds, time_limit)
 
 
 def main() -> None:
@@ -250,7 +253,10 @@ def main() -> None:
     parser.add_argument("--time-limit", type=int, default=60)
     parser.add_argument("--skip-build", action="store_true")
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--workers", type=int, default=1)
     args = parser.parse_args()
+    if args.workers < 1:
+        parser.error("--workers must be at least 1")
 
     instance_path = args.instance.resolve()
     variants = prepare_variants(instance_path, ROOT / "experiment" / "instances")
@@ -261,8 +267,13 @@ def main() -> None:
         build_image()
 
     for seed in args.seeds:
-        for model, variant in variants.items():
-            run_one(model, variant, seed, args.time_limit)
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            futures = [
+                executor.submit(run_one, model, variant, seed, args.time_limit)
+                for model, variant in variants.items()
+            ]
+            for future in futures:
+                future.result()
 
     rows = collect_rows(instance_path, args.seeds, args.time_limit)
     write_outputs(rows, args.seeds, args.time_limit)
