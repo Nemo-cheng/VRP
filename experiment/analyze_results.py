@@ -63,7 +63,6 @@ def plot_model_comparison(rows: list[dict[str, str]], output_dir: Path) -> None:
         ("charging_visits", "Charging visits", 1.0),
     )
     fig, axes = plt.subplots(2, 2, figsize=(7.2, 4.8), constrained_layout=True)
-    offsets = (-0.10, -0.05, 0.0, 0.05, 0.10)
 
     for panel_index, (axis, (metric, label, scale)) in enumerate(zip(axes.flat, panels)):
         for model_index, model in enumerate(MODEL_ORDER):
@@ -89,6 +88,12 @@ def plot_model_comparison(rows: list[dict[str, str]], output_dir: Path) -> None:
                 linewidth=0.9,
                 zorder=3,
             )
+            offsets = [
+                0.0
+                if len(values) == 1
+                else -0.14 + 0.28 * index / (len(values) - 1)
+                for index in range(len(values))
+            ]
             for offset, value in zip(offsets, values):
                 axis.scatter(
                     model_index + offset,
