@@ -1,0 +1,12 @@
+day_type,time_period,observations,near_zero_observations,service_minutes,minutes_per_straight_km,fit_rows,fallback_to_global
+all,all,978420,110391,7.0,9.530973239654635,526954,False
+weekday,afternoon,165526,16528,7.0,9.378161070510094,89790,False
+weekday,evening_peak,177869,21130,8.0,7.183009414371562,76395,False
+weekday,midday,282710,30350,7.0,13.380744247920715,154332,False
+weekday,morning_peak,56533,6312,7.0,14.9347448690113,32629,False
+weekday,night,15364,4379,8.0,4.217909945616496,5749,False
+weekend,afternoon,70329,6816,7.0,8.551978227597282,37911,False
+weekend,evening_peak,69730,8160,8.0,7.0026816469909114,29912,False
+weekend,midday,113833,12705,7.0,13.447935495216612,61919,False
+weekend,morning_peak,21061,2423,7.0,15.80672902687227,12213,False
+weekend,night,5465,1588,8.0,2.4277136941726845,2145,False

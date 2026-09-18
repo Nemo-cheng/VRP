@@ -1,0 +1,22 @@
+{
+  "eligible_transition_pairs": 1358866,
+  "train_pairs": 978420,
+  "validation_pairs": 380446,
+  "train_date_min": "2022-05-01",
+  "train_date_max": "2022-09-27",
+  "validation_date_min": "2022-09-28",
+  "validation_date_max": "2022-11-05",
+  "near_zero_distance_threshold_km": 0.05,
+  "segmented_model": {
+    "mae_minutes": 8.151334221062061,
+    "median_absolute_error_minutes": 2.867798484712666,
+    "mape_percent_for_gaps_at_least_5min": 44.96573442217031
+  },
+  "global_model": {
+    "mae_minutes": 8.19936275220802,
+    "median_absolute_error_minutes": 2.6305303860260807,
+    "mape_percent_for_gaps_at_least_5min": 42.66811675129617
+  },
+  "mae_improvement_percent": 0.5857593156617491,
+  "interpretation": "Predictions are composite transition times based on straight-line distance. They are not pure vehicle travel times."
+}
