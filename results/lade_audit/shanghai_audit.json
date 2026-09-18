@@ -39,7 +39,11 @@
     "delivery_gps_lng": 0,
     "delivery_gps_lat": 0
   },
-  "invalid_delivery_coordinates": 37,
+  "coordinate_outside_shanghai_bounds": {
+    "order": 37,
+    "accept_gps": 1,
+    "delivery_gps": 275
+  },
   "accept_time_parse_failures": 0,
   "delivery_time_parse_failures": 0,
   "delivery_before_accept": 0,
@@ -51,6 +55,41 @@
   },
   "aoi_count": 15564,
   "aoi_type_count": 16,
+  "route_sequence_audit": {
+    "duplicate_orders_within_courier_day": 0,
+    "duplicate_order_groups_within_courier_day": 0,
+    "recovered_sequence_negative_time_gaps": 0,
+    "equal_completion_time_pairs": 0,
+    "equal_time_pairs_over_100m": 0,
+    "coordinate_drift_km": {
+      "p50": 0.06462717320103989,
+      "p90": 0.45659755440183203,
+      "p99": 6.039424275724092,
+      "max": 193.34447755501608
+    },
+    "coordinate_drift_over_1km": 94065,
+    "coordinate_drift_pairs_excluded": 306,
+    "adjacent_pairs": 1413611,
+    "adjacent_pairs_with_valid_coordinates": 1413273,
+    "adjacent_pairs_excluded_for_coordinates": 338,
+    "adjacent_distance_km": {
+      "p50": 0.19483803067083846,
+      "p90": 1.14233557081315,
+      "p99": 6.543305272717855,
+      "max": 195.00296326810312
+    },
+    "adjacent_distance_over_10km": 7235,
+    "positive_time_gap_pairs": 1413611,
+    "implied_speed_kmh": {
+      "p50": 1.0304104639533587,
+      "p90": 4.392620008428466,
+      "p99": 16.97522886028828,
+      "max": 764.4875083895591
+    },
+    "implied_speed_over_80kmh": 598,
+    "threshold_note": "Flags are audit diagnostics only: drift >1 km, adjacent jump >10 km, or implied speed >80 km/h; they are not automatically removed.",
+    "ordering_note": "Parquet row order has no route meaning. Sequences are recovered by delivery time, with order_id used only as a deterministic tie-breaker."
+  },
   "explicit_time_window_available": false,
   "time_window_action": "Use observed delivery events for validation; define proxy service deadlines only as a separate sensitivity input."
 }
