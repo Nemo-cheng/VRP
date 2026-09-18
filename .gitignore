@@ -9,6 +9,7 @@ __pycache__/
 
 # 实验生成文件
 experiment/instances/
+processed/
 results/raw/
 results/logs/
 

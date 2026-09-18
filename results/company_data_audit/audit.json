@@ -1,0 +1,32 @@
+{
+  "source_file": "订单数据.xlsx",
+  "orders": {
+    "rows": 12098,
+    "unique_waybills": 12098,
+    "matched_to_waybill_data": 12098,
+    "completed_at_min": "2023-01-01 14:40:16",
+    "completed_at_max": "2023-12-31 20:57:41"
+  },
+  "waybill_data": {
+    "rows": 36329,
+    "unique_waybills": 12098,
+    "unique_vehicles": 5868,
+    "departed_at_min": "2023-01-01 06:17:44",
+    "arrived_at_max": "2023-12-31 23:30:39"
+  },
+  "physical_legs": {
+    "rows": 12167,
+    "analysis_eligible": 10975,
+    "invalid_time": 1,
+    "invalid_distance": 0,
+    "duration_over_72h": 25,
+    "speed_over_120kmh": 102,
+    "vehicle_type_conflicts": 1080,
+    "new_energy_eligible_legs": 12,
+    "new_energy_vehicles": 11
+  },
+  "interpretation": {
+    "unmarked_energy_type": "车型名称未标明能源类型，不能直接认定为燃油车。",
+    "analysis_eligible_rule": "时长和里程为正，时长不超过72小时，平均速度不超过120km/h，且运输事件内部车型一致。"
+  }
+}
