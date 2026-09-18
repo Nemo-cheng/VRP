@@ -22,6 +22,7 @@ ORDER_COLUMNS = {
     "volume_cm3": "total_volume（cm³）订单体积",
     "weight_kg": "total_weight（kg）订单重量",
     "pieces": "total_pieces_parcel（总包裹数）",
+    "receiver_region": "receiver_province_name（收货地省名称）",
     "completed_at": "complete time（妥投时间）",
 }
 
@@ -82,6 +83,33 @@ def prepare_orders(orders: pd.DataFrame) -> pd.DataFrame:
     for column in ("volume_cm3", "weight_kg", "pieces"):
         result[column] = pd.to_numeric(result[column], errors="coerce")
     return result
+
+
+def build_payload_pool(orders: pd.DataFrame) -> pd.DataFrame:
+    pool = orders[
+        ["volume_cm3", "weight_kg", "pieces", "receiver_region", "completed_at"]
+    ].copy()
+    pool["region"] = pool["receiver_region"].map(
+        lambda region: "shanghai"
+        if region == "上海"
+        else "yangtze_delta"
+        if region in {"江苏", "浙江"}
+        else "all"
+    )
+    pool["payload_id"] = [f"payload_{index + 1:05d}" for index in range(len(pool))]
+    pool["month"] = pool["completed_at"].dt.to_period("M").astype(str)
+    return pool[
+        [
+            "payload_id",
+            "region",
+            "receiver_region",
+            "volume_cm3",
+            "weight_kg",
+            "pieces",
+            "completed_at",
+            "month",
+        ]
+    ]
 
 
 def prepare_waybills(waybills: pd.DataFrame) -> pd.DataFrame:
@@ -175,6 +203,86 @@ def build_vehicle_type_summary(legs: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def build_vehicle_operating_profile(legs: pd.DataFrame) -> pd.DataFrame:
+    eligible = legs[legs["analysis_eligible"]].copy()
+    eligible["service_date"] = eligible["departed_at"].dt.date
+    eligible["departure_hour"] = (
+        eligible["departed_at"].dt.hour + eligible["departed_at"].dt.minute / 60
+    )
+    daily = (
+        eligible.groupby(["vehicle_id", "service_date"], as_index=False)
+        .agg(
+            daily_distance_km=("distance_km", "sum"),
+            daily_legs=("vehicle_id", "size"),
+        )
+    )
+    profile = (
+        eligible.groupby(
+            ["vehicle_type_code", "vehicle_type_name", "energy_observation"],
+            dropna=False,
+            as_index=False,
+        )
+        .agg(
+            physical_legs=("vehicle_id", "size"),
+            vehicles=("vehicle_id", "nunique"),
+            distance_km_p50=("distance_km", "median"),
+            distance_km_p90=("distance_km", lambda values: values.quantile(0.9)),
+            duration_hours_p50=("duration_hours", "median"),
+            duration_hours_p90=("duration_hours", lambda values: values.quantile(0.9)),
+            departure_hour_p50=("departure_hour", "median"),
+            departure_hour_p90=("departure_hour", lambda values: values.quantile(0.9)),
+        )
+    )
+    daily_profile = (
+        eligible[["vehicle_id", "vehicle_type_code", "vehicle_type_name", "energy_observation"]]
+        .drop_duplicates()
+        .merge(daily, on="vehicle_id", how="left")
+        .groupby(
+            ["vehicle_type_code", "vehicle_type_name", "energy_observation"],
+            dropna=False,
+            as_index=False,
+        )
+        .agg(
+            daily_distance_km_p50=("daily_distance_km", "median"),
+            daily_distance_km_p90=("daily_distance_km", lambda values: values.quantile(0.9)),
+            daily_distance_km_max=("daily_distance_km", "max"),
+            daily_legs_p50=("daily_legs", "median"),
+        )
+    )
+    return profile.merge(
+        daily_profile,
+        on=["vehicle_type_code", "vehicle_type_name", "energy_observation"],
+        how="left",
+    ).sort_values(["physical_legs", "vehicles"], ascending=False)
+
+
+def build_payload_summary(payload_pool: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for region, frame in payload_pool.groupby("region", sort=True):
+        rows.append(
+            {
+                "region": region,
+                "orders": len(frame),
+                "missing_volume": int(frame["volume_cm3"].isna().sum()),
+                "missing_weight": int(frame["weight_kg"].isna().sum()),
+                "missing_pieces": int(frame["pieces"].isna().sum()),
+                "volume_p50_cm3": frame["volume_cm3"].quantile(0.5),
+                "volume_p90_cm3": frame["volume_cm3"].quantile(0.9),
+                "weight_p50_kg": frame["weight_kg"].quantile(0.5),
+                "weight_p90_kg": frame["weight_kg"].quantile(0.9),
+                "pieces_p50": frame["pieces"].quantile(0.5),
+                "pieces_p90": frame["pieces"].quantile(0.9),
+                "weight_volume_corr": frame[["weight_kg", "volume_cm3"]]
+                .corr()
+                .loc["weight_kg", "volume_cm3"],
+                "region_count": frame["receiver_region"].nunique(),
+                "date_min": frame["completed_at"].min(),
+                "date_max": frame["completed_at"].max(),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def build_audit(
     source_path: Path,
     orders: pd.DataFrame,
@@ -237,14 +345,28 @@ def main() -> None:
     orders = prepare_orders(orders_raw)
     waybills = prepare_waybills(waybills_raw)
     legs, inconsistent = build_physical_legs(orders, waybills)
+    payload_pool = build_payload_pool(orders)
     type_summary = build_vehicle_type_summary(legs)
+    vehicle_profile = build_vehicle_operating_profile(legs)
+    payload_summary = build_payload_summary(payload_pool)
     audit = build_audit(args.input, orders, waybills, legs, inconsistent)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.summary_dir.mkdir(parents=True, exist_ok=True)
     legs.to_csv(args.output_dir / "physical_legs.csv", index=False, encoding="utf-8-sig")
+    payload_pool.to_csv(
+        args.output_dir / "payload_pool.csv", index=False, encoding="utf-8-sig"
+    )
+    vehicle_profile.to_csv(
+        args.output_dir / "vehicle_operating_profile.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     type_summary.to_csv(
         args.summary_dir / "vehicle_type_summary.csv", index=False, encoding="utf-8-sig"
+    )
+    payload_summary.to_csv(
+        args.summary_dir / "payload_summary.csv", index=False, encoding="utf-8-sig"
     )
     (args.summary_dir / "audit.json").write_text(
         json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8"

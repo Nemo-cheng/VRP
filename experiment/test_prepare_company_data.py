@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import pandas as pd
-from prepare_company_data import build_physical_legs, build_vehicle_type_summary
+from prepare_company_data import (
+    build_payload_pool,
+    build_physical_legs,
+    build_vehicle_operating_profile,
+    build_vehicle_type_summary,
+)
 
 
 def test_physical_leg_aggregation_and_conflict_filtering() -> None:
@@ -11,6 +16,7 @@ def test_physical_leg_aggregation_and_conflict_filtering() -> None:
             "volume_cm3": [1000, 2000, 3000],
             "weight_kg": [1.0, 2.0, 3.0],
             "pieces": [1, 1, 1],
+            "receiver_region": ["上海", "江苏", "北京"],
             "completed_at": pd.to_datetime(["2023-01-02"] * 3),
         }
     )
@@ -49,3 +55,11 @@ def test_physical_leg_aggregation_and_conflict_filtering() -> None:
     assert summary.iloc[0]["energy_observation"] == "新能源"
     assert set(legs["vehicle_id"]) == {"vehicle_00001", "vehicle_00002"}
     assert "plate-1" not in legs.to_csv(index=False)
+
+    payload_pool = build_payload_pool(orders)
+    assert set(payload_pool["region"]) == {"shanghai", "yangtze_delta", "all"}
+    assert len(payload_pool) == 3
+
+    profile = build_vehicle_operating_profile(legs)
+    assert len(profile) == 1
+    assert profile.iloc[0]["daily_distance_km_max"] == 30.0
