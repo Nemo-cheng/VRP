@@ -1,0 +1,50 @@
+{
+  "source_rows": 1483864,
+  "courier_days": 70253,
+  "recovered_waves": 124998,
+  "break_rules": {
+    "long_gap_minutes": 120.0,
+    "long_jump_km": 10.0,
+    "max_plausible_speed_kmh": 80.0,
+    "region_change": true,
+    "invalid_coordinate_pair": true
+  },
+  "break_counts": {
+    "day_start": 70253,
+    "long_gap": 47972,
+    "long_jump": 7235,
+    "high_speed": 598,
+    "region_change": 196,
+    "invalid_coordinate": 338
+  },
+  "route_stop_count": {
+    "p50": 7.0,
+    "p90": 31.0,
+    "p99": 49.0,
+    "max": 100.0
+  },
+  "route_work_span_minutes": {
+    "p50": 117.0,
+    "p90": 518.0,
+    "p99": 701.0,
+    "max": 917.0
+  },
+  "route_straight_line_distance_km": {
+    "p50": 2.4279822195792327,
+    "p90": 12.147291017072352,
+    "p99": 38.83759853487503,
+    "max": 138.6516714847283
+  },
+  "route_max_service_radius_km": {
+    "p50": 0.5583586436035542,
+    "p90": 2.6689875825164613,
+    "p99": 7.24606250518789,
+    "max": 30.28894182533339
+  },
+  "routes_with_at_least_10_stops": 54945,
+  "routes_with_complete_coordinates": 124723,
+  "complete_coordinate_route_share": 0.9977999647994368,
+  "start_proxy_fallback_routes": 1,
+  "endpoint_note": "The first task accept GPS is a wave-start proxy, not a verified depot. The final delivery GPS is only the observed route endpoint.",
+  "privacy_note": "Raw courier_id and order_id are omitted from processed outputs; route_id is sequential and dataset-local."
+}
