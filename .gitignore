@@ -12,6 +12,7 @@ experiment/instances/
 processed/
 results/raw/
 results/logs/
+cache/
 
 # 当前统一实验未使用的公开算例
 external_data/e-cvrp_benchmark_instances/
