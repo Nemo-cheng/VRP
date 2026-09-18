@@ -1,0 +1,5 @@
+vehicle_class,geometry_status,required_before_final_selection
+cargo_two_wheeler,candidate_for_compact_routes,"payload, road access, range, cost and emission parameters"
+cargo_tricycle,candidate_for_compact_and_medium_routes,"payload, road access, range, cost and emission parameters"
+microvan,candidate_for_medium_and_extended_routes,"payload, road access, range, cost and emission parameters"
+4.2m_box_truck,capacity_case_only,"payload proof, urban access, range, cost and emission parameters"

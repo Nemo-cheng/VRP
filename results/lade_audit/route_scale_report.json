@@ -1,0 +1,15 @@
+{
+  "all_recovered_waves": 124998,
+  "eligible_routes": 54945,
+  "eligibility_rule": "At least 10 stops and 100% valid delivery coordinates.",
+  "eligible_share": 0.43956703307252915,
+  "eligible_orders": 1260096,
+  "start_proxy_sensitivity": {
+    "interpretation": "Closed proxy distance adds the start-to-first and last-to-start straight-line legs. The start proxy is not a verified depot.",
+    "median_open_distance_km": 6.411699406888272,
+    "median_closed_proxy_distance_km": 9.957715450113811,
+    "p90_closed_proxy_distance_km": 24.129751299776288
+  },
+  "distance_limit": "All distances are great-circle lower bounds. Road-network distance is deferred to stage C.",
+  "vehicle_decision": "Geometry supports retaining four candidate classes for later checks. Final vehicle selection requires stage C road access, stage D route payloads, and stage E vehicle parameters."
+}
