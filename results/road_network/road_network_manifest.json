@@ -1,0 +1,19 @@
+{
+  "osm_snapshot": "2022-10-31T23:59:59Z",
+  "network_type": "drive_service",
+  "instances": 10,
+  "coordinate_mode_selection_metric": "Global median nearest-road distance across all benchmark points.",
+  "coordinate_mode_global_median_nearest_road_m": {
+    "raw": 42.557736009667295,
+    "gcj02_to_wgs84": 31.93853512905695
+  },
+  "consistent_coordinate_mode": true,
+  "selected_coordinate_mode": "gcj02_to_wgs84",
+  "coordinate_interpretation": "LaDe does not declare its CRS. The selected GCJ02-to-WGS84 conversion is an empirical alignment decision and remains a sensitivity assumption.",
+  "graph_connectivity": "Largest strongly connected component for round-trip vehicle routing.",
+  "od_pairs": 22210,
+  "unreachable_od_pairs": 0,
+  "od_scope": "Start proxy and customer nodes only. Charging stations are added in stage F.",
+  "distance_unit": "metres",
+  "connector_rule": "Non-diagonal OD distance includes origin and destination straight-line connectors to their matched road nodes."
+}
