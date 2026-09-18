@@ -1,0 +1,31 @@
+{
+  "payload_pool": "shanghai",
+  "source_pool_orders": 3688,
+  "eligible_routes": 54945,
+  "tasks_per_seed": 1260096,
+  "seeds": [
+    1103,
+    2207,
+    3301,
+    4409,
+    5501,
+    6607,
+    7703,
+    8807,
+    9901,
+    10103
+  ],
+  "versions": 10,
+  "paired_sampling": true,
+  "source_weight_volume_correlation": 0.7657842010960937,
+  "validation_thresholds": {
+    "maximum_absolute_correlation_error": 0.02,
+    "maximum_relative_mean_error": 0.02
+  },
+  "maximum_absolute_correlation_error": 0.006040251463519386,
+  "maximum_weight_mean_relative_error": 0.0013557351926882788,
+  "maximum_volume_mean_relative_error": 0.0012252365049150171,
+  "distribution_validation_passed": true,
+  "selection_note": "Shanghai pool is used because it has more than 1,000 complete paired payload observations. No Yangtze Delta fallback is required.",
+  "capacity_note": "Route load distributions are descriptive until candidate vehicle capacities are sourced in stage E."
+}
