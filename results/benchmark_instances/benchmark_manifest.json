@@ -1,0 +1,87 @@
+{
+  "reference_seed": 1103,
+  "selection_count": 10,
+  "selection_types": {
+    "20": [
+      "representative",
+      "distance_stress",
+      "payload_stress"
+    ],
+    "30": [
+      "representative",
+      "distance_stress",
+      "payload_stress"
+    ],
+    "50": [
+      "representative",
+      "distance_stress",
+      "payload_stress"
+    ],
+    "100": [
+      "representative"
+    ]
+  },
+  "generated_files": [
+    {
+      "seed": 10103,
+      "file": "benchmark_seed_10103.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 1103,
+      "file": "benchmark_seed_1103.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 2207,
+      "file": "benchmark_seed_2207.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 3301,
+      "file": "benchmark_seed_3301.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 4409,
+      "file": "benchmark_seed_4409.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 5501,
+      "file": "benchmark_seed_5501.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 6607,
+      "file": "benchmark_seed_6607.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 7703,
+      "file": "benchmark_seed_7703.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 8807,
+      "file": "benchmark_seed_8807.parquet",
+      "instances": 10,
+      "tasks": 400
+    },
+    {
+      "seed": 9901,
+      "file": "benchmark_seed_9901.parquet",
+      "instances": 10,
+      "tasks": 400
+    }
+  ],
+  "selection_note": "The 100-customer class has one eligible route and is treated as a boundary stress case, not a representative route."
+}
