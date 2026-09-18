@@ -15,6 +15,7 @@ results/logs/
 
 # 当前统一实验未使用的公开算例
 external_data/e-cvrp_benchmark_instances/
+external_data/LaDe-D/
 external_data/EVRP-TW-SPD-HMA/data/akb_instances/
 external_data/EVRP-TW-SPD-HMA/data/jd_instances/*
 !external_data/EVRP-TW-SPD-HMA/data/jd_instances/jd200_1.txt

@@ -1,0 +1,56 @@
+{
+  "file": "delivery_sh-00000-of-00001-ad9a4b1d79823540.parquet",
+  "city_values": [
+    "Shanghai"
+  ],
+  "rows": 1483864,
+  "unique_orders": 1483864,
+  "unique_couriers": 1733,
+  "working_days": 184,
+  "date_code_min": 501,
+  "date_code_max": 1031,
+  "missing_values": {
+    "order_id": 0,
+    "region_id": 0,
+    "city": 0,
+    "courier_id": 0,
+    "lng": 0,
+    "lat": 0,
+    "aoi_id": 0,
+    "aoi_type": 0,
+    "accept_time": 0,
+    "accept_gps_time": 0,
+    "accept_gps_lng": 0,
+    "accept_gps_lat": 0,
+    "delivery_time": 0,
+    "delivery_gps_time": 0,
+    "delivery_gps_lng": 0,
+    "delivery_gps_lat": 0,
+    "ds": 0,
+    "accept_dt": 0,
+    "delivery_dt": 0,
+    "event_duration_minutes": 0
+  },
+  "coordinate_missing": {
+    "lng": 0,
+    "lat": 0,
+    "accept_gps_lng": 0,
+    "accept_gps_lat": 0,
+    "delivery_gps_lng": 0,
+    "delivery_gps_lat": 0
+  },
+  "invalid_delivery_coordinates": 37,
+  "accept_time_parse_failures": 0,
+  "delivery_time_parse_failures": 0,
+  "delivery_before_accept": 0,
+  "event_duration_minutes": {
+    "p50": 72.0,
+    "p90": 211.0,
+    "p99": 652.0,
+    "max": 47739.0
+  },
+  "aoi_count": 15564,
+  "aoi_type_count": 16,
+  "explicit_time_window_available": false,
+  "time_window_action": "Use observed delivery events for validation; define proxy service deadlines only as a separate sensitivity input."
+}
