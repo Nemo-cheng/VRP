@@ -66,3 +66,54 @@ def test_time_dependent_evaluation_removes_late_link() -> None:
 
     assert time_links.empty
     assert diagnostics["links_removed_by_time_dependence"] == 1
+
+
+def test_p90_mode_uses_p90_travel_time() -> None:
+    links = pd.DataFrame(
+        {
+            "instance_id": ["i1"],
+            "from_task_id": ["a"],
+            "to_task_id": ["b"],
+            "deadhead_duration_hours_p50": [1.0],
+            "deadhead_distance_km": [10.0],
+            "deadhead_path": ["A>B"],
+            "available_slack_hours": [1.0],
+        }
+    )
+    tasks = pd.DataFrame(
+        {
+            "task_id": ["a", "b"],
+            "arrived_at": ["2023-01-01 08:00", "2023-01-01 12:00"],
+            "departed_at": ["2023-01-01 07:00", "2023-01-01 09:30"],
+        }
+    )
+    edges = pd.DataFrame(
+        {
+            "origin_site_id": ["A"],
+            "destination_site_id": ["B"],
+            "duration_hours_p50": [1.0],
+            "duration_hours_p90": [2.0],
+            "high_confidence": [True],
+        }
+    )
+    periods = pd.DataFrame(
+        {
+            "origin_site_id": ["A"],
+            "destination_site_id": ["B"],
+            "departure_period": ["morning_peak"],
+            "duration_hours_p50": [1.0],
+            "duration_hours_p90": [2.0],
+            "period_estimate_available": [True],
+        }
+    )
+
+    p50_links, _ = build_time_dependent_links(
+        links, tasks, edges, periods, "p50"
+    )
+    p90_links, diagnostics = build_time_dependent_links(
+        links, tasks, edges, periods, "p90"
+    )
+
+    assert len(p50_links) == 1
+    assert p90_links.empty
+    assert diagnostics["travel_time_stat"] == "p90"
