@@ -1,32 +1,21 @@
-# 京东统一路径实验
+# 订单运输路径优化实验
 
-当前路线实验统一使用 `EVRP-TW-SPD-HMA/data/jd_instances/jd200_1.txt`。
+项目当前只使用本地 `订单数据.xlsx`，研究网点级运输路径与发车时段优化。原始 Excel、含运单号和车辆标识的中间数据不会提交到公开仓库。
 
-实验入口与指标说明见：
-
-```text
-experiment/统一实验说明.md
-4天统一数据实验规划.md
-```
-
-快速运行：
-
-```powershell
-uv run python experiment/run.py --skip-build --time-limit 30
-```
-
-首次运行或需要重建求解器镜像时，去掉 `--skip-build`。
-
-正式实验结果：
+当前实验规划见：
 
 ```text
-results/正式实验结果解读.md
-results/batch_summary.md
-results/figures/
+订单数据优化实验规划.md
 ```
 
-重新生成分析图：
+运行数据可优化性审计：
 
 ```powershell
-uv run python experiment/analyze_results.py
+uv run experiment/audit_excel_optimization_scope.py
+```
+
+运行现有测试：
+
+```powershell
+uv run --with pytest --with pandas --with openpyxl pytest experiment/test_audit_excel_optimization_scope.py experiment/test_prepare_excel_transport_data.py -q
 ```
