@@ -46,6 +46,7 @@ uv run experiment/build_vrp_holdout_data.py
 uv run experiment/compare_basic_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
 uv run experiment/optimize_type_compatible_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
 uv run experiment/optimize_time_dependent_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
+uv run experiment/optimize_time_dependent_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout --travel-time-stat p90
 ```
 
 统一结果位于：
