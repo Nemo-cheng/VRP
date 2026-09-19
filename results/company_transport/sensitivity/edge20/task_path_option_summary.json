@@ -1,0 +1,11 @@
+{
+  "source_only": "订单数据.xlsx",
+  "network_covered_tasks": 3080,
+  "tasks_with_feasible_alternative_paths": 18,
+  "alternative_path_task_share": 0.005844155844155844,
+  "path_options": 4658,
+  "qualified_instances": 52,
+  "qualified_instances_with_alternative_paths": 3,
+  "qualified_instances_with_at_least_10_alternative_tasks": 0,
+  "historical_option_coverage_rate": 1.0
+}

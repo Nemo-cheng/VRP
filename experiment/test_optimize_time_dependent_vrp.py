@@ -1,10 +1,7 @@
 import pandas as pd
 
-from optimize_time_dependent_vrp import (
-    build_time_dependent_links,
-    evaluate_time_dependent_path,
-    period_for_timestamp,
-)
+from optimize_time_dependent_vrp import build_time_dependent_links
+from vrp_time_utils import evaluate_time_dependent_path, period_for_timestamp
 
 
 def test_period_boundaries() -> None:

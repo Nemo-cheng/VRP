@@ -1,0 +1,36 @@
+{
+  "source_only": "订单数据.xlsx",
+  "thresholds": {
+    "min_edge_observations": 20,
+    "min_period_observations": 5,
+    "min_linkable_tasks_per_instance": 10,
+    "required_independent_instances": 20
+  },
+  "tasks": {
+    "eligible_tasks": 10975,
+    "required_field_complete_share": 1.0,
+    "network_covered_tasks": 3080,
+    "network_coverage_share": 0.2806378132118451
+  },
+  "network": {
+    "directed_edges": 3061,
+    "high_confidence_edges": 75,
+    "period_cells": 4075,
+    "reliable_period_cells": 482
+  },
+  "instances": {
+    "date_component_instances": 224,
+    "qualified_instances": 52,
+    "qualified_tasks": 2042,
+    "qualified_linkable_tasks": 1115,
+    "candidate_task_links": 5648,
+    "largest_instance_tasks": 65,
+    "largest_instance_linkable_tasks": 45
+  },
+  "gate_checks": {
+    "task_fields_complete": true,
+    "enough_independent_instances": true,
+    "every_qualified_instance_meets_task_threshold": true
+  },
+  "ready_for_basic_vrp_comparison": true
+}
