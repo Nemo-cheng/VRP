@@ -1,0 +1,62 @@
+{
+  "source_only": "订单数据.xlsx",
+  "interpretation": "Vehicle cost is expressed as an equivalent number of deadhead kilometres because the source has no monetary vehicle cost.",
+  "instances": 34,
+  "tasks": 1070,
+  "vehicle_cost_scenarios_km": [
+    1.0,
+    10.0,
+    25.0,
+    50.0,
+    75.0,
+    80.0,
+    85.0,
+    89.0,
+    90.0,
+    100.0,
+    250.0,
+    500.0,
+    1000.0
+  ],
+  "pareto_scenarios": [
+    "vehicle_cost_1_km",
+    "vehicle_cost_10_km",
+    "vehicle_cost_25_km",
+    "vehicle_cost_50_km",
+    "vehicle_cost_75_km",
+    "vehicle_cost_80_km",
+    "vehicle_cost_85_km",
+    "vehicle_cost_89_km",
+    "vehicle_cost_90_km",
+    "vehicle_cost_100_km",
+    "vehicle_cost_250_km",
+    "vehicle_cost_500_km",
+    "vehicle_cost_1000_km",
+    "minimum_vehicles"
+  ],
+  "minimum_observed_vehicle_count": 821,
+  "maximum_observed_vehicle_count": 954,
+  "minimum_observed_deadhead_distance_km": 0.0,
+  "minimum_vehicle_deadhead_distance_km": 9937.860000000002,
+  "historical_p50_chain_vehicle_count": 1011,
+  "historical_p50_chain_deadhead_distance_km": 3704.1500000000005,
+  "scenarios_dominating_historical_p50_chains": [
+    "vehicle_cost_80_km",
+    "vehicle_cost_85_km",
+    "vehicle_cost_75_km",
+    "vehicle_cost_50_km",
+    "vehicle_cost_25_km",
+    "vehicle_cost_10_km",
+    "vehicle_cost_1_km"
+  ],
+  "best_scenario_with_no_more_deadhead_than_history": {
+    "scenario": "vehicle_cost_80_km",
+    "vehicle_count": 857,
+    "vehicle_reduction": 154,
+    "vehicle_reduction_rate": 0.152324431256182,
+    "internal_deadhead_distance_km": 3626.52,
+    "deadhead_reduction_km": 77.63000000000056
+  },
+  "all_scenarios_feasible": true,
+  "selection_rule": "Choose the scenario matching an independently supplied vehicle cost per dispatch; no unique monetary optimum is identifiable from the order data alone."
+}
