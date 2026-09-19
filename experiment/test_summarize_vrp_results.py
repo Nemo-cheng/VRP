@@ -37,6 +37,18 @@ def make_result_set(directory: Path, alternative_share: float) -> None:
         },
     )
     write_json(
+        directory / "robust_p90_vrp_summary.json",
+        {
+            "p50_time_dependent_vehicle_count": 82,
+            "p90_robust_vehicle_count": 84,
+            "vehicles_added_by_p90_robustness": 2,
+            "links_removed_by_time_dependence": 5,
+            "task_service_rate": 1.0,
+            "time_overlap_violations": 0,
+            "all_instances_solved": True,
+        },
+    )
+    write_json(
         directory / "task_path_option_summary.json",
         {"alternative_path_task_share": alternative_share},
     )
@@ -75,6 +87,17 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "all_instances_solved": True,
         },
     )
+    write_json(
+        holdout / "robust_p90_vrp_summary.json",
+        {
+            "p90_robust_vehicle_count": 84,
+            "vehicles_added_by_p90_robustness": 2,
+            "links_removed_by_time_dependence": 5,
+            "task_service_rate": 1.0,
+            "time_overlap_violations": 0,
+            "all_instances_solved": True,
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -82,3 +105,4 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
     assert report["decision"]["proceed_with_vrp_comparison"]
     assert not report["decision"]["use_loaded_path_choice_as_main_experiment"]
     assert report["gate_checks"]["chronological_holdout_feasible"]
+    assert report["main_findings"]["p90_always_increases_vehicle_count"]

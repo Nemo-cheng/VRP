@@ -34,6 +34,7 @@ def summarize_threshold(directory: Path, threshold: int) -> dict[str, object]:
     basic = read_json(directory / "basic_vrp_summary.json")
     vehicle_type = read_json(directory / "type_compatible_vrp_summary.json")
     time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
+    robust_p90 = read_json(directory / "robust_p90_vrp_summary.json")
     paths = read_json(directory / "task_path_option_summary.json")
     basic_vehicles = int(basic["vrp_vehicle_count"])
     type_vehicles = int(vehicle_type["type_compatible_vehicle_count"])
@@ -57,6 +58,19 @@ def summarize_threshold(directory: Path, threshold: int) -> dict[str, object]:
         "time_dependent_deadhead_distance_km": time_dependent[
             "internal_deadhead_distance_km"
         ],
+        "p90_robust_vehicle_count": robust_p90["p90_robust_vehicle_count"],
+        "p90_vehicle_increase_rate": (
+            robust_p90["p90_robust_vehicle_count"]
+            - robust_p90["p50_time_dependent_vehicle_count"]
+        )
+        / robust_p90["p50_time_dependent_vehicle_count"],
+        "p90_removed_candidate_links": robust_p90[
+            "links_removed_by_time_dependence"
+        ],
+        "p90_task_service_rate": robust_p90["task_service_rate"],
+        "p90_time_overlap_violations": robust_p90[
+            "time_overlap_violations"
+        ],
         "alternative_path_task_share": paths["alternative_path_task_share"],
         "task_service_rate": time_dependent["task_service_rate"],
         "route_type_violations": time_dependent["route_type_violations"],
@@ -69,6 +83,7 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
     basic = read_json(directory / "basic_vrp_summary.json")
     vehicle_type = read_json(directory / "type_compatible_vrp_summary.json")
     time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
+    robust_p90 = read_json(directory / "robust_p90_vrp_summary.json")
     return {
         "protocol": readiness["validation_protocol"],
         "qualified_instances": readiness["instances"]["qualified_instances"],
@@ -91,6 +106,16 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
             "deadhead_endpoint_violations"
         ],
         "all_instances_solved": time_dependent["all_instances_solved"],
+        "p90_robust_vehicle_count": robust_p90["p90_robust_vehicle_count"],
+        "p90_vehicles_added": robust_p90["vehicles_added_by_p90_robustness"],
+        "p90_removed_candidate_links": robust_p90[
+            "links_removed_by_time_dependence"
+        ],
+        "p90_task_service_rate": robust_p90["task_service_rate"],
+        "p90_time_overlap_violations": robust_p90[
+            "time_overlap_violations"
+        ],
+        "p90_all_instances_solved": robust_p90["all_instances_solved"],
     }
 
 
@@ -106,6 +131,8 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
         table["task_service_rate"].eq(1.0).all()
         and table["route_type_violations"].eq(0).all()
         and table["all_instances_solved"].all()
+        and table["p90_task_service_rate"].eq(1.0).all()
+        and table["p90_time_overlap_violations"].eq(0).all()
     )
     stable_basic_effect = bool(
         table["basic_vehicle_reduction_rate"].between(0.20, 0.35).all()
@@ -120,6 +147,9 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
         and holdout["time_overlap_violations"] == 0
         and holdout["deadhead_endpoint_violations"] == 0
         and holdout["all_instances_solved"]
+        and holdout["p90_task_service_rate"] == 1.0
+        and holdout["p90_time_overlap_violations"] == 0
+        and holdout["p90_all_instances_solved"]
     )
     report = {
         "source_only": "订单数据.xlsx",
@@ -146,6 +176,13 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "time_dependence_always_removes_static_links": bool(
                 table["links_removed_by_time_dependence"].gt(0).all()
             ),
+            "p90_always_increases_vehicle_count": bool(
+                table["p90_vehicle_increase_rate"].gt(0).all()
+            ),
+            "p90_vehicle_increase_rate_range": [
+                float(table["p90_vehicle_increase_rate"].min()),
+                float(table["p90_vehicle_increase_rate"].max()),
+            ],
             "alternative_path_share_range": [
                 float(table["alternative_path_task_share"].min()),
                 float(table["alternative_path_task_share"].max()),

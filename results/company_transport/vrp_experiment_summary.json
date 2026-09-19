@@ -19,6 +19,11 @@
     ],
     "vehicle_type_compatibility_always_increases_vehicle_count": true,
     "time_dependence_always_removes_static_links": true,
+    "p90_always_increases_vehicle_count": true,
+    "p90_vehicle_increase_rate_range": [
+      0.013789195315451454,
+      0.029485570890840654
+    ],
     "alternative_path_share_range": [
       0.005844155844155844,
       0.01034231609613984
@@ -50,7 +55,13 @@
     "route_type_violations": 0,
     "time_overlap_violations": 0,
     "deadhead_endpoint_violations": 0,
-    "all_instances_solved": true
+    "all_instances_solved": true,
+    "p90_robust_vehicle_count": 832,
+    "p90_vehicles_added": 11,
+    "p90_removed_candidate_links": 141,
+    "p90_task_service_rate": 1.0,
+    "p90_time_overlap_violations": 0,
+    "p90_all_instances_solved": true
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
 }

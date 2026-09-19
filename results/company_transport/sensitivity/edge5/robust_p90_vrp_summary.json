@@ -1,0 +1,22 @@
+{
+  "source_only": "订单数据.xlsx",
+  "comparison": "P50 versus P90 time-dependent type-compatible VRP on the same candidate paths.",
+  "static_candidate_links": 15475,
+  "time_feasible_candidate_links": 13112,
+  "links_removed_by_time_dependence": 2363,
+  "deadhead_edge_traversals": 27116,
+  "reliable_period_edge_uses": 9352,
+  "travel_time_stat": "p90",
+  "instances": 90,
+  "tasks": 6572,
+  "p50_time_dependent_vehicle_count": 5294,
+  "p90_robust_vehicle_count": 5367,
+  "vehicles_added_by_p90_robustness": 73,
+  "internal_deadhead_distance_km": 36425.310000000005,
+  "task_service_rate": 1.0,
+  "route_type_violations": 0,
+  "time_overlap_violations": 0,
+  "deadhead_endpoint_violations": 0,
+  "missing_selected_link_paths": 0,
+  "all_instances_solved": true
+}
