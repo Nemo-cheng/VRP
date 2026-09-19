@@ -24,9 +24,7 @@ from scipy.sparse import coo_matrix
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="联合优化经验兼容车型和任务链。")
-    parser.add_argument(
-        "--data-dir", type=Path, default=Path("processed/company/vrp")
-    )
+    parser.add_argument("--data-dir", type=Path, default=Path("processed/company/vrp"))
     parser.add_argument(
         "--result-dir", type=Path, default=Path("results/company_transport")
     )
@@ -39,6 +37,7 @@ def solve_type_compatible_path_cover(
     compatible_types: dict[str, set[str]],
     links: pd.DataFrame,
     time_limit: float = 60.0,
+    vehicle_cost_equivalent_km: float | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object]]:
     y_keys = [
         (task_id, vehicle_type)
@@ -52,12 +51,18 @@ def solve_type_compatible_path_cover(
         end = str(link["to_task_id"])
         link_lookup[(start, end)] = link
         common_types = compatible_types[start] & compatible_types[end]
-        x_keys.extend((start, end, vehicle_type) for vehicle_type in sorted(common_types))
+        x_keys.extend(
+            (start, end, vehicle_type) for vehicle_type in sorted(common_types)
+        )
 
     variable_keys = [("y", *key) for key in y_keys] + [("x", *key) for key in x_keys]
     variable_index = {key: index for index, key in enumerate(variable_keys)}
     total_link_distance = float(links["deadhead_distance_km"].sum())
-    cardinality_priority = total_link_distance + 1.0
+    cardinality_priority = (
+        total_link_distance + 1.0
+        if vehicle_cost_equivalent_km is None
+        else vehicle_cost_equivalent_km
+    )
     objective = np.zeros(len(variable_keys))
     for start, end, vehicle_type in x_keys:
         distance = float(link_lookup[(start, end)]["deadhead_distance_km"])
@@ -101,12 +106,18 @@ def solve_type_compatible_path_cover(
         y_index = variable_index[("y", task_id, vehicle_type)]
         outgoing_values = {y_index: -1.0}
         outgoing_values.update(
-            {variable_index[("x", *key)]: 1.0 for key in outgoing[(task_id, vehicle_type)]}
+            {
+                variable_index[("x", *key)]: 1.0
+                for key in outgoing[(task_id, vehicle_type)]
+            }
         )
         add_constraint(outgoing_values, -np.inf, 0.0)
         incoming_values = {y_index: -1.0}
         incoming_values.update(
-            {variable_index[("x", *key)]: 1.0 for key in incoming[(task_id, vehicle_type)]}
+            {
+                variable_index[("x", *key)]: 1.0
+                for key in incoming[(task_id, vehicle_type)]
+            }
         )
         add_constraint(incoming_values, -np.inf, 0.0)
 
@@ -168,6 +179,12 @@ def solve_type_compatible_path_cover(
         "solver_status": int(result.status),
         "solver_message": result.message,
         "optimality_gap": float(result.mip_gap) if result.mip_gap is not None else None,
+        "objective_mode": (
+            "minimum_vehicles_then_deadhead"
+            if vehicle_cost_equivalent_km is None
+            else "vehicle_deadhead_weighted_cost"
+        ),
+        "vehicle_cost_equivalent_km": vehicle_cost_equivalent_km,
     }
     return pd.DataFrame(assignment_rows), selected, diagnostics
 
@@ -220,9 +237,7 @@ def attach_route_details(
     for link in selected.itertuples(index=False):
         ready_at = pd.to_datetime(task_lookup.loc[link.from_task_id, "arrived_at"])
         ready_at += pd.to_timedelta(link.deadhead_duration_hours_p50, unit="h")
-        next_departure = pd.to_datetime(
-            task_lookup.loc[link.to_task_id, "departed_at"]
-        )
+        next_departure = pd.to_datetime(task_lookup.loc[link.to_task_id, "departed_at"])
         time_violations += int(ready_at > next_departure)
         if pd.isna(link.deadhead_path):
             missing_paths += 1
@@ -256,16 +271,16 @@ def optimize_instances(
     instances["service_date"] = instances["service_date"].astype("string")
     lane_types = lane_type_compatibility
     if lane_types is None:
-        lane_types = tasks.groupby(
-            ["origin_site_id", "destination_site_id"]
-        )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
+        lane_types = tasks.groupby(["origin_site_id", "destination_site_id"])[
+            "vehicle_type_name"
+        ].agg(lambda values: set(values.dropna()))
     task_instances = tasks.merge(
         instances[["instance_id", "service_date", "component_id", "qualifies_for_vrp"]],
         on=["service_date", "component_id"],
         how="left",
         validate="many_to_one",
     )
-    qualified = task_instances[task_instances["qualifies_for_vrp"] == True]  # noqa: E712
+    qualified = task_instances[task_instances["qualifies_for_vrp"] == True]
     task_types: dict[str, set[str]] = {}
     for row in qualified.itertuples(index=False):
         lane = (row.origin_site_id, row.destination_site_id)
@@ -284,9 +299,7 @@ def optimize_instances(
         assignments, selected, diagnostics = solve_type_compatible_path_cover(
             task_ids, task_types, instance_links, time_limit
         )
-        assignments, validation = attach_route_details(
-            assignments, selected, group
-        )
+        assignments, validation = attach_route_details(assignments, selected, group)
         assignments["instance_id"] = instance_id
         schedule_parts.append(assignments)
         vehicle_count = assignments["vehicle_id"].nunique()
@@ -311,7 +324,10 @@ def optimize_instances(
                     assignments["task_id"].duplicated().sum()
                 ),
                 "route_type_violations": int(
-                    (assignments.groupby("vehicle_id")["vehicle_type_name"].nunique() > 1).sum()
+                    (
+                        assignments.groupby("vehicle_id")["vehicle_type_name"].nunique()
+                        > 1
+                    ).sum()
                 ),
                 **validation,
                 "solver_success": diagnostics["solver_success"],
@@ -324,7 +340,7 @@ def optimize_instances(
     summary = {
         "source_only": "订单数据.xlsx",
         "vehicle_type_interpretation": "A vehicle type is eligible for a task only when that type appears historically on the same directed lane.",
-        "instances": int(len(metrics)),
+        "instances": len(metrics),
         "tasks": int(metrics["task_count"].sum()),
         "basic_vrp_vehicle_count": int(metrics["basic_vrp_vehicle_count"].sum()),
         "type_compatible_vehicle_count": int(
@@ -340,13 +356,9 @@ def optimize_instances(
             (metrics["task_service_rate"] * metrics["task_count"]).sum()
             / metrics["task_count"].sum()
         ),
-        "duplicate_task_assignments": int(
-            metrics["duplicate_task_assignments"].sum()
-        ),
+        "duplicate_task_assignments": int(metrics["duplicate_task_assignments"].sum()),
         "route_type_violations": int(metrics["route_type_violations"].sum()),
-        "time_overlap_violations": int(
-            metrics["time_overlap_violations"].sum()
-        ),
+        "time_overlap_violations": int(metrics["time_overlap_violations"].sum()),
         "deadhead_endpoint_violations": int(
             metrics["deadhead_endpoint_violations"].sum()
         ),

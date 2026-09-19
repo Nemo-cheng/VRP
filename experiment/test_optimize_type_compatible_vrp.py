@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 from optimize_type_compatible_vrp import (
     attach_route_details,
     optimize_instances,
@@ -38,9 +37,7 @@ def test_joint_model_keeps_one_type_for_each_vehicle_route() -> None:
     assert diagnostics["solver_success"]
     assert assignments["vehicle_id"].nunique() == 2
     assert len(selected) == 1
-    assert (
-        assignments.groupby("vehicle_id")["vehicle_type_name"].nunique() == 1
-    ).all()
+    assert (assignments.groupby("vehicle_id")["vehicle_type_name"].nunique() == 1).all()
 
 
 def test_route_details_are_recomputable() -> None:
@@ -80,6 +77,38 @@ def test_route_details_are_recomputable() -> None:
     assert all(value == 0 for value in validation.values())
 
 
+def test_vehicle_cost_controls_vehicle_deadhead_tradeoff() -> None:
+    links = pd.DataFrame(
+        {
+            "instance_id": ["i1"],
+            "from_task_id": ["a"],
+            "to_task_id": ["b"],
+            "deadhead_distance_km": [50.0],
+        }
+    )
+    compatible_types = {"a": {"van"}, "b": {"van"}}
+
+    low_cost, low_links, low_diagnostics = solve_type_compatible_path_cover(
+        ["a", "b"],
+        compatible_types,
+        links,
+        vehicle_cost_equivalent_km=40.0,
+    )
+    high_cost, high_links, high_diagnostics = solve_type_compatible_path_cover(
+        ["a", "b"],
+        compatible_types,
+        links,
+        vehicle_cost_equivalent_km=60.0,
+    )
+
+    assert low_cost["vehicle_id"].nunique() == 2
+    assert low_links.empty
+    assert high_cost["vehicle_id"].nunique() == 1
+    assert len(high_links) == 1
+    assert low_diagnostics["objective_mode"] == "vehicle_deadhead_weighted_cost"
+    assert high_diagnostics["vehicle_cost_equivalent_km"] == 60.0
+
+
 def test_missing_training_type_evidence_fails_explicitly() -> None:
     tasks = pd.DataFrame(
         {
@@ -102,9 +131,7 @@ def test_missing_training_type_evidence_fails_explicitly() -> None:
             "qualifies_for_vrp": [True],
         }
     )
-    basic_metrics = pd.DataFrame(
-        {"instance_id": ["i1"], "vrp_vehicle_count": [1]}
-    )
+    basic_metrics = pd.DataFrame({"instance_id": ["i1"], "vrp_vehicle_count": [1]})
     empty_links = pd.DataFrame(columns=["instance_id"])
     training_types = pd.Series(
         [{"train_type"}],
