@@ -27,3 +27,21 @@ uv run experiment/audit_excel_optimization_scope.py
 ```powershell
 uv run --with pytest --with pandas --with openpyxl pytest experiment/test_audit_excel_optimization_scope.py experiment/test_prepare_excel_transport_data.py -q
 ```
+
+核心实验依次运行：
+
+```powershell
+uv run experiment/build_vrp_data_layer.py
+uv run experiment/compare_basic_vrp.py
+uv run experiment/optimize_type_compatible_vrp.py
+uv run experiment/optimize_time_dependent_vrp.py
+uv run experiment/build_task_path_options.py
+uv run experiment/summarize_vrp_results.py
+```
+
+统一结果位于：
+
+```text
+results/company_transport/vrp_experiment_summary.json
+results/company_transport/vrp_robustness_summary.csv
+```
