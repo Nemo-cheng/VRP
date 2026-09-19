@@ -178,6 +178,7 @@ def optimize_instances(
     links: pd.DataFrame,
     basic_metrics: pd.DataFrame,
     time_limit: float,
+    baseline_vehicle_column: str = "vrp_vehicle_count",
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object]]:
     tasks = tasks.copy()
     tasks["service_date"] = tasks["service_date"].astype("string")
@@ -230,11 +231,11 @@ def optimize_instances(
                 "instance_id": instance_id,
                 "task_count": len(group),
                 "basic_vrp_vehicle_count": int(
-                    basic_lookup.loc[instance_id, "vrp_vehicle_count"]
+                    basic_lookup.loc[instance_id, baseline_vehicle_column]
                 ),
                 "type_compatible_vehicle_count": vehicle_count,
                 "vehicles_added_by_type_compatibility": vehicle_count
-                - int(basic_lookup.loc[instance_id, "vrp_vehicle_count"]),
+                - int(basic_lookup.loc[instance_id, baseline_vehicle_column]),
                 "selected_task_links": len(selected),
                 "internal_deadhead_distance_km": float(
                     selected["deadhead_distance_km"].sum()

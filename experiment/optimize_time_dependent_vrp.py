@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+"""Re-evaluate task links with time-dependent travel and optimize the VRP."""
+
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "pandas>=2.2",
+#   "scipy>=1.14",
+# ]
+# ///
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import pandas as pd
+
+from optimize_type_compatible_vrp import optimize_instances
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="优化分时段车型兼容 VRP。")
+    parser.add_argument(
+        "--data-dir", type=Path, default=Path("processed/company/vrp")
+    )
+    parser.add_argument(
+        "--result-dir", type=Path, default=Path("results/company_transport")
+    )
+    parser.add_argument("--time-limit", type=float, default=60.0)
+    return parser.parse_args()
+
+
+def period_for_timestamp(timestamp: pd.Timestamp) -> str:
+    hour = timestamp.hour
+    if hour <= 5:
+        return "night"
+    if hour <= 9:
+        return "morning_peak"
+    if hour <= 15:
+        return "daytime"
+    if hour <= 19:
+        return "evening_peak"
+    return "evening"
+
+
+def evaluate_time_dependent_path(
+    path: list[str],
+    departed_at: pd.Timestamp,
+    edge_lookup: dict[tuple[str, str], float],
+    period_lookup: dict[tuple[str, str, str], float],
+) -> tuple[float, int, int]:
+    current_time = departed_at
+    reliable_period_edges = 0
+    total_edges = 0
+    for origin, destination in zip(path, path[1:]):
+        total_edges += 1
+        period = period_for_timestamp(current_time)
+        period_key = (origin, destination, period)
+        if period_key in period_lookup:
+            duration = period_lookup[period_key]
+            reliable_period_edges += 1
+        else:
+            duration = edge_lookup[(origin, destination)]
+        current_time += pd.to_timedelta(duration, unit="h")
+    return (
+        (current_time - departed_at).total_seconds() / 3600,
+        reliable_period_edges,
+        total_edges,
+    )
+
+
+def build_time_dependent_links(
+    links: pd.DataFrame,
+    tasks: pd.DataFrame,
+    edges: pd.DataFrame,
+    periods: pd.DataFrame,
+) -> tuple[pd.DataFrame, dict[str, int]]:
+    task_time = tasks.set_index("task_id")[["arrived_at", "departed_at"]].copy()
+    task_time["arrived_at"] = pd.to_datetime(task_time["arrived_at"])
+    task_time["departed_at"] = pd.to_datetime(task_time["departed_at"])
+    edge_lookup = {
+        (row.origin_site_id, row.destination_site_id): float(row.duration_hours_p50)
+        for row in edges[edges["high_confidence"]].itertuples(index=False)
+    }
+    reliable_periods = periods[periods["period_estimate_available"]]
+    period_lookup = {
+        (row.origin_site_id, row.destination_site_id, row.departure_period): float(
+            row.duration_hours_p50
+        )
+        for row in reliable_periods.itertuples(index=False)
+    }
+
+    rows: list[dict[str, object]] = []
+    period_edge_uses = 0
+    total_edge_uses = 0
+    for link in links.itertuples(index=False):
+        path = str(link.deadhead_path).split(">")
+        start_time = task_time.loc[link.from_task_id, "arrived_at"]
+        duration, reliable_edges, total_edges = evaluate_time_dependent_path(
+            path, start_time, edge_lookup, period_lookup
+        )
+        period_edge_uses += reliable_edges
+        total_edge_uses += total_edges
+        ready_at = start_time + pd.to_timedelta(duration, unit="h")
+        next_departure = task_time.loc[link.to_task_id, "departed_at"]
+        if ready_at <= next_departure:
+            row = link._asdict()
+            row["static_deadhead_duration_hours_p50"] = row[
+                "deadhead_duration_hours_p50"
+            ]
+            row["deadhead_duration_hours_p50"] = duration
+            row["available_slack_hours"] = (
+                next_departure - ready_at
+            ).total_seconds() / 3600
+            row["period_edge_uses"] = reliable_edges
+            row["path_edge_count"] = total_edges
+            rows.append(row)
+    diagnostics = {
+        "static_candidate_links": int(len(links)),
+        "time_feasible_candidate_links": int(len(rows)),
+        "links_removed_by_time_dependence": int(len(links) - len(rows)),
+        "deadhead_edge_traversals": total_edge_uses,
+        "reliable_period_edge_uses": period_edge_uses,
+    }
+    return pd.DataFrame(rows), diagnostics
+
+
+def main() -> None:
+    args = parse_args()
+    tasks = pd.read_csv(args.data_dir / "tasks.csv", low_memory=False)
+    instances = pd.read_csv(args.data_dir / "instances.csv")
+    links = pd.read_csv(args.data_dir / "candidate_task_links.csv")
+    edges = pd.read_csv(args.data_dir / "network_edges.csv")
+    periods = pd.read_csv(args.data_dir / "edge_period_stats.csv")
+    static_metrics = pd.read_csv(
+        args.result_dir / "type_compatible_vrp_comparison.csv"
+    )
+    time_links, diagnostics = build_time_dependent_links(
+        links, tasks, edges, periods
+    )
+    metrics, schedules, summary = optimize_instances(
+        tasks,
+        instances,
+        time_links,
+        static_metrics,
+        args.time_limit,
+        baseline_vehicle_column="type_compatible_vehicle_count",
+    )
+    metrics = metrics.rename(
+        columns={
+            "basic_vrp_vehicle_count": "static_type_compatible_vehicle_count",
+            "type_compatible_vehicle_count": "time_dependent_vehicle_count",
+            "vehicles_added_by_type_compatibility": "vehicles_added_by_time_dependence",
+        }
+    )
+    summary = {
+        "source_only": "订单数据.xlsx",
+        "comparison": "Static type-compatible VRP versus time-dependent type-compatible VRP on the same candidate paths.",
+        **diagnostics,
+        "instances": int(len(metrics)),
+        "tasks": int(metrics["task_count"].sum()),
+        "static_type_compatible_vehicle_count": int(
+            metrics["static_type_compatible_vehicle_count"].sum()
+        ),
+        "time_dependent_vehicle_count": int(
+            metrics["time_dependent_vehicle_count"].sum()
+        ),
+        "vehicles_added_by_time_dependence": int(
+            metrics["vehicles_added_by_time_dependence"].sum()
+        ),
+        "internal_deadhead_distance_km": float(
+            metrics["internal_deadhead_distance_km"].sum()
+        ),
+        "task_service_rate": float(
+            (metrics["task_service_rate"] * metrics["task_count"]).sum()
+            / metrics["task_count"].sum()
+        ),
+        "route_type_violations": int(metrics["route_type_violations"].sum()),
+        "all_instances_solved": bool(metrics["solver_success"].all()),
+    }
+    time_links.to_csv(
+        args.data_dir / "time_dependent_candidate_task_links.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    schedules.to_csv(
+        args.data_dir / "time_dependent_vrp_schedules.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    metrics.to_csv(
+        args.result_dir / "time_dependent_vrp_comparison.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    (args.result_dir / "time_dependent_vrp_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
