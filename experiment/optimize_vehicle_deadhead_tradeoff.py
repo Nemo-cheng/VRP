@@ -41,6 +41,7 @@ def parse_args() -> argparse.Namespace:
         default="1,10,25,50,75,80,85,89,90,100,250,500,1000",
     )
     parser.add_argument("--time-limit", type=float, default=60.0)
+    parser.add_argument("--travel-time-stat", choices=["p50", "p90"], default="p50")
     return parser.parse_args()
 
 
@@ -159,9 +160,9 @@ def evaluate_scenario(
 
 
 def historical_chain_metrics(
-    chains: pd.DataFrame, links: pd.DataFrame
+    chains: pd.DataFrame, links: pd.DataFrame, baseline_variant: str = "p50"
 ) -> dict[str, object]:
-    p50_chains = chains[chains["baseline_variant"] == "p50"].sort_values(
+    variant_chains = chains[chains["baseline_variant"] == baseline_variant].sort_values(
         ["historical_chain_id", "sequence"]
     )
     link_distance = {
@@ -172,7 +173,7 @@ def historical_chain_metrics(
     }
     distance = 0.0
     transition_count = 0
-    for _, group in p50_chains.groupby("historical_chain_id", sort=False):
+    for _, group in variant_chains.groupby("historical_chain_id", sort=False):
         records = list(group.itertuples(index=False))
         for first, second in pairwise(records):
             distance += link_distance[
@@ -180,12 +181,12 @@ def historical_chain_metrics(
             ]
             transition_count += 1
     return {
-        "scenario": "historical_p50_verifiable_chains",
+        "scenario": f"historical_{baseline_variant}_verifiable_chains",
         "vehicle_cost_equivalent_km": None,
-        "tasks": len(p50_chains),
-        "vehicle_count": int(p50_chains["historical_chain_id"].nunique()),
+        "tasks": len(variant_chains),
+        "vehicle_count": int(variant_chains["historical_chain_id"].nunique()),
         "vehicles_reduced_vs_one_task_one_vehicle": int(
-            len(p50_chains) - p50_chains["historical_chain_id"].nunique()
+            len(variant_chains) - variant_chains["historical_chain_id"].nunique()
         ),
         "selected_task_links": transition_count,
         "internal_deadhead_distance_km": distance,
@@ -196,7 +197,7 @@ def historical_chain_metrics(
 def mark_pareto_frontier(table: pd.DataFrame) -> pd.DataFrame:
     result = table.copy()
     result["pareto_efficient"] = False
-    scenario_rows = result[result["scenario"] != "historical_p50_verifiable_chains"]
+    scenario_rows = result[~result["scenario"].str.startswith("historical_")]
     for index, row in scenario_rows.iterrows():
         dominated = (
             (scenario_rows["vehicle_count"] <= row["vehicle_count"])
@@ -223,6 +224,7 @@ def run_tradeoff(
     chains: pd.DataFrame,
     vehicle_costs: list[float],
     time_limit: float,
+    baseline_variant: str = "p50",
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object]]:
     instance_parts: list[pd.DataFrame] = []
     summaries: list[dict[str, object]] = []
@@ -234,12 +236,11 @@ def run_tradeoff(
         metrics["vehicle_cost_equivalent_km"] = cost
         instance_parts.append(metrics)
         summaries.append(summary)
-    summaries.append(historical_chain_metrics(chains, links))
+    historical_scenario = f"historical_{baseline_variant}_verifiable_chains"
+    summaries.append(historical_chain_metrics(chains, links, baseline_variant))
     frontier = mark_pareto_frontier(pd.DataFrame(summaries))
-    scenario_rows = frontier[frontier["scenario"] != "historical_p50_verifiable_chains"]
-    historical = frontier[
-        frontier["scenario"] == "historical_p50_verifiable_chains"
-    ].iloc[0]
+    scenario_rows = frontier[frontier["scenario"] != historical_scenario]
+    historical = frontier[frontier["scenario"] == historical_scenario].iloc[0]
     dominates_history = scenario_rows[
         (scenario_rows["vehicle_count"] <= historical["vehicle_count"])
         & (
@@ -250,6 +251,7 @@ def run_tradeoff(
     best_no_more_deadhead = dominates_history.iloc[0]
     report = {
         "source_only": "订单数据.xlsx",
+        "travel_time_stat": baseline_variant,
         "interpretation": (
             "Vehicle cost is expressed as an equivalent number of deadhead "
             "kilometres because the source has no monetary vehicle cost."
@@ -271,11 +273,13 @@ def run_tradeoff(
                 "internal_deadhead_distance_km",
             ].iloc[0]
         ),
-        "historical_p50_chain_vehicle_count": int(historical["vehicle_count"]),
-        "historical_p50_chain_deadhead_distance_km": float(
+        f"historical_{baseline_variant}_chain_vehicle_count": int(
+            historical["vehicle_count"]
+        ),
+        f"historical_{baseline_variant}_chain_deadhead_distance_km": float(
             historical["internal_deadhead_distance_km"]
         ),
-        "scenarios_dominating_historical_p50_chains": dominates_history[
+        f"scenarios_dominating_historical_{baseline_variant}_chains": dominates_history[
             "scenario"
         ].tolist(),
         "best_scenario_with_no_more_deadhead_than_history": {
@@ -317,25 +321,41 @@ def main() -> None:
     costs = [float(value) for value in args.vehicle_costs.split(",")]
     tasks = pd.read_csv(args.data_dir / "tasks.csv", low_memory=False)
     instances = pd.read_csv(args.data_dir / "instances.csv")
-    links = pd.read_csv(args.data_dir / "time_dependent_candidate_task_links.csv")
+    link_filename = (
+        "time_dependent_candidate_task_links.csv"
+        if args.travel_time_stat == "p50"
+        else "robust_p90_candidate_task_links.csv"
+    )
+    output_prefix = (
+        "vehicle_deadhead_tradeoff"
+        if args.travel_time_stat == "p50"
+        else "robust_p90_vehicle_deadhead_tradeoff"
+    )
+    links = pd.read_csv(args.data_dir / link_filename)
     lane_types = pd.read_csv(args.data_dir / "lane_vehicle_types.csv")
     chains = pd.read_csv(args.data_dir / "historical_vehicle_chains.csv")
     qualified, task_types = prepare_problem(tasks, instances, lane_types)
     frontier, instance_metrics, report = run_tradeoff(
-        qualified, task_types, links, chains, costs, args.time_limit
+        qualified,
+        task_types,
+        links,
+        chains,
+        costs,
+        args.time_limit,
+        args.travel_time_stat,
     )
 
     frontier.to_csv(
-        args.result_dir / "vehicle_deadhead_tradeoff.csv",
+        args.result_dir / f"{output_prefix}.csv",
         index=False,
         encoding="utf-8-sig",
     )
     instance_metrics.to_csv(
-        args.result_dir / "vehicle_deadhead_tradeoff_instances.csv",
+        args.result_dir / f"{output_prefix}_instances.csv",
         index=False,
         encoding="utf-8-sig",
     )
-    (args.result_dir / "vehicle_deadhead_tradeoff_summary.json").write_text(
+    (args.result_dir / f"{output_prefix}_summary.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(frontier.to_string(index=False))

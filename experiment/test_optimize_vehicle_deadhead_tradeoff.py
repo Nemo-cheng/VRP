@@ -98,6 +98,12 @@ def test_historical_chain_distance_is_recomputed_from_verified_links() -> None:
     assert result["selected_task_links"] == 1
     assert result["internal_deadhead_distance_km"] == 50.0
 
+    p90_result = historical_chain_metrics(chains, make_links(), "p90")
+
+    assert p90_result["scenario"] == "historical_p90_verifiable_chains"
+    assert p90_result["vehicle_count"] == 1
+    assert p90_result["selected_task_links"] == 0
+
 
 def test_pareto_frontier_removes_dominated_scenario() -> None:
     table = pd.DataFrame(

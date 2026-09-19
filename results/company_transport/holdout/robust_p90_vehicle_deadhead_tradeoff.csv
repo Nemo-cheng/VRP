@@ -1,0 +1,16 @@
+﻿scenario,vehicle_cost_equivalent_km,tasks,vehicle_count,vehicles_reduced_vs_one_task_one_vehicle,selected_task_links,internal_deadhead_distance_km,weighted_proxy_cost,task_service_rate,duplicate_task_assignments,route_type_violations,time_overlap_violations,deadhead_endpoint_violations,missing_selected_link_paths,all_instances_solved,pareto_efficient
+vehicle_cost_1_km,1.0,1070,954,116,116,0.0,954.0,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_10_km,10.0,1070,938,132,132,136.32,9516.32,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_25_km,25.0,1070,903,167,167,777.37,23352.37,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_50_km,50.0,1070,896,174,174,1048.4299999999998,45848.43,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_75_km,75.0,1070,874,196,196,2444.94,67994.94,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_80_km,80.0,1070,862,208,208,3367.4400000000005,72327.44,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_85_km,85.0,1070,862,208,208,3367.4400000000005,76637.44,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_89_km,89.0,1070,861,209,209,3455.44,80084.44,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_90_km,90.0,1070,861,209,209,3455.44,80945.44,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_100_km,100.0,1070,861,209,209,3455.44,89555.44,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_250_km,250.0,1070,839,231,231,6310.02,216060.02,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_500_km,500.0,1070,832,238,238,8318.659999999998,424318.66,1.0,0.0,0.0,0.0,0.0,0.0,True,True
+vehicle_cost_1000_km,1000.0,1070,832,238,238,8318.66,840318.66,1.0,0.0,0.0,0.0,0.0,0.0,True,False
+minimum_vehicles,,1070,832,238,238,8318.66,,1.0,0.0,0.0,0.0,0.0,0.0,True,False
+historical_p90_verifiable_chains,,1070,1013,57,57,3463.1500000000005,,,,,,,,,False
