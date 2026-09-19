@@ -248,14 +248,17 @@ def optimize_instances(
     basic_metrics: pd.DataFrame,
     time_limit: float,
     baseline_vehicle_column: str = "vrp_vehicle_count",
+    lane_type_compatibility: pd.Series | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object]]:
     tasks = tasks.copy()
     tasks["service_date"] = tasks["service_date"].astype("string")
     instances = instances.copy()
     instances["service_date"] = instances["service_date"].astype("string")
-    lane_types = tasks.groupby(
-        ["origin_site_id", "destination_site_id"]
-    )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
+    lane_types = lane_type_compatibility
+    if lane_types is None:
+        lane_types = tasks.groupby(
+            ["origin_site_id", "destination_site_id"]
+        )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
     task_types = {
         row.task_id: lane_types[(row.origin_site_id, row.destination_site_id)]
         for row in tasks.itertuples(index=False)
@@ -357,8 +360,20 @@ def main() -> None:
     instances = pd.read_csv(args.data_dir / "instances.csv")
     links = pd.read_csv(args.data_dir / "candidate_task_links.csv")
     basic_metrics = pd.read_csv(args.result_dir / "basic_vrp_instance_comparison.csv")
+    lane_type_path = args.data_dir / "lane_vehicle_types.csv"
+    lane_type_compatibility = None
+    if lane_type_path.exists():
+        lane_type_rows = pd.read_csv(lane_type_path)
+        lane_type_compatibility = lane_type_rows.groupby(
+            ["origin_site_id", "destination_site_id"]
+        )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
     metrics, schedules, summary = optimize_instances(
-        tasks, instances, links, basic_metrics, args.time_limit
+        tasks,
+        instances,
+        links,
+        basic_metrics,
+        args.time_limit,
+        lane_type_compatibility=lane_type_compatibility,
     )
     metrics.to_csv(
         args.result_dir / "type_compatible_vrp_comparison.csv",

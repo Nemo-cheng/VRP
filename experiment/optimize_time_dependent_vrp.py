@@ -99,6 +99,13 @@ def main() -> None:
     static_metrics = pd.read_csv(
         args.result_dir / "type_compatible_vrp_comparison.csv"
     )
+    lane_type_path = args.data_dir / "lane_vehicle_types.csv"
+    lane_type_compatibility = None
+    if lane_type_path.exists():
+        lane_type_rows = pd.read_csv(lane_type_path)
+        lane_type_compatibility = lane_type_rows.groupby(
+            ["origin_site_id", "destination_site_id"]
+        )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
     time_links, diagnostics = build_time_dependent_links(
         links, tasks, edges, periods
     )
@@ -109,6 +116,7 @@ def main() -> None:
         static_metrics,
         args.time_limit,
         baseline_vehicle_column="type_compatible_vehicle_count",
+        lane_type_compatibility=lane_type_compatibility,
     )
     metrics = metrics.rename(
         columns={

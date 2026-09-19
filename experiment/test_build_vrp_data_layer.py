@@ -4,6 +4,7 @@ import pandas as pd
 from build_vrp_data_layer import (
     assign_components,
     build_instances,
+    build_lane_vehicle_types,
     build_network_tables,
     build_tasks,
 )
@@ -58,3 +59,15 @@ def test_builds_time_feasible_task_links() -> None:
     link = links.query("from_task_id == 'e1' and to_task_id == 'e2'").iloc[0]
     assert link["deadhead_distance_km"] == 0.0
     assert link["deadhead_path"] == "B"
+
+
+def test_builds_explicit_lane_vehicle_type_evidence() -> None:
+    tasks = build_tasks(sample_events())
+
+    lane_types = build_lane_vehicle_types(tasks)
+
+    lane_ab = lane_types.query(
+        "origin_site_id == 'A' and destination_site_id == 'B'"
+    )
+    assert set(lane_ab["vehicle_type_name"]) == {"type1", "type2"}
+    assert lane_ab["observations"].sum() == 2

@@ -93,6 +93,20 @@ def build_network_tables(
     return edges, periods
 
 
+def build_lane_vehicle_types(tasks: pd.DataFrame) -> pd.DataFrame:
+    return (
+        tasks.groupby(
+            ["origin_site_id", "destination_site_id", "vehicle_type_name"],
+            as_index=False,
+        )
+        .agg(observations=("task_id", "size"))
+        .sort_values(
+            ["origin_site_id", "destination_site_id", "observations"],
+            ascending=[True, True, False],
+        )
+    )
+
+
 def build_high_confidence_graph(edges: pd.DataFrame) -> nx.DiGraph:
     graph = nx.DiGraph()
     selected = edges[edges["high_confidence"]]
@@ -301,6 +315,7 @@ def main() -> None:
     edges, periods = build_network_tables(
         tasks, args.min_edge_observations, args.min_period_observations
     )
+    lane_vehicle_types = build_lane_vehicle_types(tasks)
     graph = build_high_confidence_graph(edges)
     tasks = assign_components(tasks, graph)
     instances, links = build_instances(tasks, graph, args.min_instance_tasks)
@@ -322,6 +337,9 @@ def main() -> None:
     edges.to_csv(args.output_dir / "network_edges.csv", index=False, encoding="utf-8-sig")
     periods.to_csv(
         args.output_dir / "edge_period_stats.csv", index=False, encoding="utf-8-sig"
+    )
+    lane_vehicle_types.to_csv(
+        args.output_dir / "lane_vehicle_types.csv", index=False, encoding="utf-8-sig"
     )
     instances.to_csv(args.output_dir / "instances.csv", index=False, encoding="utf-8-sig")
     links.to_csv(
