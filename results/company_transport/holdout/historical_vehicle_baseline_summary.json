@@ -1,0 +1,32 @@
+{
+  "source_only": "订单数据.xlsx",
+  "scope": "Chronological holdout tasks in qualified VRP instances.",
+  "instances": 34,
+  "tasks": 1070,
+  "raw_historical_vehicle_count": 983,
+  "p50_historical_chain_count": 1011,
+  "p90_historical_chain_count": 1013,
+  "basic_vrp_vehicle_count": 741,
+  "type_compatible_vehicle_count": 820,
+  "p50_vrp_vehicle_count": 821,
+  "p90_vrp_vehicle_count": 832,
+  "p50_vehicle_reduction_vs_historical_chains": 0.18793273986152326,
+  "p90_vehicle_reduction_vs_historical_chains": 0.17867719644619942,
+  "p50_chain_validation": {
+    "observed_consecutive_transitions": 87,
+    "verified_consecutive_transitions": 59,
+    "transitions_split_by_infeasibility": 28,
+    "transitions_split_by_vehicle_type_change": 0,
+    "tasks_with_missing_historical_vehicle": 0,
+    "verifiable_historical_chains": 1011
+  },
+  "p90_chain_validation": {
+    "observed_consecutive_transitions": 87,
+    "verified_consecutive_transitions": 57,
+    "transitions_split_by_infeasibility": 30,
+    "transitions_split_by_vehicle_type_change": 0,
+    "tasks_with_missing_historical_vehicle": 0,
+    "verifiable_historical_chains": 1013
+  },
+  "interpretation_limit": "Reductions apply to verifiable vehicle chains in the observed holdout sample, not to the company's complete fleet."
+}
