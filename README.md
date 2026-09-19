@@ -39,6 +39,15 @@ uv run experiment/build_task_path_options.py
 uv run experiment/summarize_vrp_results.py
 ```
 
+时间外验证依次运行：
+
+```powershell
+uv run experiment/build_vrp_holdout_data.py
+uv run experiment/compare_basic_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
+uv run experiment/optimize_type_compatible_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
+uv run experiment/optimize_time_dependent_vrp.py --data-dir processed/company/vrp_holdout --result-dir results/company_transport/holdout
+```
+
 统一结果位于：
 
 ```text
