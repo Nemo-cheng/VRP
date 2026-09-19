@@ -64,6 +64,36 @@ def summarize_threshold(directory: Path, threshold: int) -> dict[str, object]:
     }
 
 
+def summarize_holdout(directory: Path) -> dict[str, object]:
+    readiness = read_json(directory / "vrp_data_readiness.json")
+    basic = read_json(directory / "basic_vrp_summary.json")
+    vehicle_type = read_json(directory / "type_compatible_vrp_summary.json")
+    time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
+    return {
+        "protocol": readiness["validation_protocol"],
+        "qualified_instances": readiness["instances"]["qualified_instances"],
+        "qualified_tasks": readiness["instances"]["qualified_tasks"],
+        "basic_vehicle_reduction_rate": basic["vehicle_reduction_rate"],
+        "basic_vrp_vehicle_count": basic["vrp_vehicle_count"],
+        "type_compatible_vehicle_count": vehicle_type[
+            "type_compatible_vehicle_count"
+        ],
+        "time_dependent_vehicle_count": time_dependent[
+            "time_dependent_vehicle_count"
+        ],
+        "links_removed_by_time_dependence": time_dependent[
+            "links_removed_by_time_dependence"
+        ],
+        "task_service_rate": time_dependent["task_service_rate"],
+        "route_type_violations": time_dependent["route_type_violations"],
+        "time_overlap_violations": time_dependent["time_overlap_violations"],
+        "deadhead_endpoint_violations": time_dependent[
+            "deadhead_endpoint_violations"
+        ],
+        "all_instances_solved": time_dependent["all_instances_solved"],
+    }
+
+
 def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
     directories = {
         5: result_dir / "sensitivity" / "edge5",
@@ -83,6 +113,14 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
     path_selection_supported = bool(
         (table["alternative_path_task_share"] >= 0.05).all()
     )
+    holdout = summarize_holdout(result_dir / "holdout")
+    holdout_feasible = bool(
+        holdout["task_service_rate"] == 1.0
+        and holdout["route_type_violations"] == 0
+        and holdout["time_overlap_violations"] == 0
+        and holdout["deadhead_endpoint_violations"] == 0
+        and holdout["all_instances_solved"]
+    )
     report = {
         "source_only": "订单数据.xlsx",
         "completed_comparisons": [
@@ -95,6 +133,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "all_reported_vrp_solutions_feasible": all_feasible,
             "basic_vrp_effect_stable_across_thresholds": stable_basic_effect,
             "loaded_path_selection_has_sufficient_coverage": path_selection_supported,
+            "chronological_holdout_feasible": holdout_feasible,
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [
@@ -113,12 +152,15 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             ],
         },
         "decision": {
-            "proceed_with_vrp_comparison": all_feasible and stable_basic_effect,
+            "proceed_with_vrp_comparison": all_feasible
+            and stable_basic_effect
+            and holdout_feasible,
             "use_loaded_path_choice_as_main_experiment": path_selection_supported,
             "loaded_path_choice_role": "supplementary analysis"
             if not path_selection_supported
             else "main experiment",
         },
+        "chronological_holdout": holdout,
         "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet.",
     }
     return table, report

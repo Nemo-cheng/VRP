@@ -9,7 +9,8 @@
   "gate_checks": {
     "all_reported_vrp_solutions_feasible": true,
     "basic_vrp_effect_stable_across_thresholds": true,
-    "loaded_path_selection_has_sufficient_coverage": false
+    "loaded_path_selection_has_sufficient_coverage": false,
+    "chronological_holdout_feasible": true
   },
   "main_findings": {
     "basic_vehicle_reduction_rate_range": [
@@ -27,6 +28,29 @@
     "proceed_with_vrp_comparison": true,
     "use_loaded_path_choice_as_main_experiment": false,
     "loaded_path_choice_role": "supplementary analysis"
+  },
+  "chronological_holdout": {
+    "protocol": {
+      "split": "chronological",
+      "cutoff": "2023-10-01",
+      "train_period_end_exclusive": "2023-10-01",
+      "test_period_start_inclusive": "2023-10-01",
+      "train_tasks": 7232,
+      "test_tasks": 3743,
+      "network_and_vehicle_type_evidence_from_train_only": true
+    },
+    "qualified_instances": 34,
+    "qualified_tasks": 1070,
+    "basic_vehicle_reduction_rate": 0.3074766355140187,
+    "basic_vrp_vehicle_count": 741,
+    "type_compatible_vehicle_count": 820,
+    "time_dependent_vehicle_count": 821,
+    "links_removed_by_time_dependence": 5,
+    "task_service_rate": 1.0,
+    "route_type_violations": 0,
+    "time_overlap_violations": 0,
+    "deadhead_endpoint_violations": 0,
+    "all_instances_solved": true
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
 }

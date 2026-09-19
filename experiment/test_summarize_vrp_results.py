@@ -46,9 +46,39 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
     make_result_set(tmp_path, 0.01)
     make_result_set(tmp_path / "sensitivity" / "edge5", 0.02)
     make_result_set(tmp_path / "sensitivity" / "edge20", 0.005)
+    holdout = tmp_path / "holdout"
+    holdout.mkdir()
+    write_json(
+        holdout / "vrp_data_readiness.json",
+        {
+            "validation_protocol": {"split": "chronological"},
+            "instances": {"qualified_instances": 20, "qualified_tasks": 100},
+        },
+    )
+    write_json(
+        holdout / "basic_vrp_summary.json",
+        {"vehicle_reduction_rate": 0.25, "vrp_vehicle_count": 75},
+    )
+    write_json(
+        holdout / "type_compatible_vrp_summary.json",
+        {"type_compatible_vehicle_count": 80},
+    )
+    write_json(
+        holdout / "time_dependent_vrp_summary.json",
+        {
+            "time_dependent_vehicle_count": 82,
+            "links_removed_by_time_dependence": 3,
+            "task_service_rate": 1.0,
+            "route_type_violations": 0,
+            "time_overlap_violations": 0,
+            "deadhead_endpoint_violations": 0,
+            "all_instances_solved": True,
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
     assert len(table) == 3
     assert report["decision"]["proceed_with_vrp_comparison"]
     assert not report["decision"]["use_loaded_path_choice_as_main_experiment"]
+    assert report["gate_checks"]["chronological_holdout_feasible"]

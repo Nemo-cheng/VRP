@@ -1,0 +1,18 @@
+{
+  "comparison_scope": "Qualified date-component instances from 订单数据.xlsx",
+  "interpretation": "Independent routing assumes one vehicle appears at each task origin. Basic VRP explicitly connects consecutive tasks and counts internal deadhead only.",
+  "instances": 34,
+  "tasks": 1070,
+  "independent_vehicle_count": 1070,
+  "vrp_vehicle_count": 741,
+  "vehicle_reduction": 329,
+  "vehicle_reduction_rate": 0.3074766355140187,
+  "loaded_distance_km": 159633.30000000002,
+  "vrp_internal_deadhead_distance_km": 5103.21,
+  "task_service_rate": 1.0,
+  "time_overlap_violations": 0,
+  "duplicate_task_assignments": 0,
+  "missing_task_assignments": 0,
+  "missing_selected_link_paths": 0,
+  "result_scope_note": "Vehicle counts measure consolidation within the observed task sample and do not estimate the company's complete fleet."
+}

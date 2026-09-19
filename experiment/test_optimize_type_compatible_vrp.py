@@ -1,7 +1,9 @@
 import pandas as pd
+import pytest
 
 from optimize_type_compatible_vrp import (
     attach_route_details,
+    optimize_instances,
     solve_type_compatible_path_cover,
 )
 
@@ -76,3 +78,45 @@ def test_route_details_are_recomputable() -> None:
     assert route.loc[0, "next_task_id"] == "b"
     assert route.loc[0, "deadhead_to_next_path"] == "B>C"
     assert all(value == 0 for value in validation.values())
+
+
+def test_missing_training_type_evidence_fails_explicitly() -> None:
+    tasks = pd.DataFrame(
+        {
+            "task_id": ["a"],
+            "service_date": ["2023-10-01"],
+            "component_id": ["c1"],
+            "origin_site_id": ["A"],
+            "destination_site_id": ["B"],
+            "vehicle_type_name": ["test_type"],
+            "departed_at": ["2023-10-01 08:00"],
+            "arrived_at": ["2023-10-01 09:00"],
+            "distance_km": [10.0],
+        }
+    )
+    instances = pd.DataFrame(
+        {
+            "instance_id": ["i1"],
+            "service_date": ["2023-10-01"],
+            "component_id": ["c1"],
+            "qualifies_for_vrp": [True],
+        }
+    )
+    basic_metrics = pd.DataFrame(
+        {"instance_id": ["i1"], "vrp_vehicle_count": [1]}
+    )
+    empty_links = pd.DataFrame(columns=["instance_id"])
+    training_types = pd.Series(
+        [{"train_type"}],
+        index=pd.MultiIndex.from_tuples([("X", "Y")]),
+    )
+
+    with pytest.raises(ValueError, match="no vehicle-type evidence"):
+        optimize_instances(
+            tasks,
+            instances,
+            empty_links,
+            basic_metrics,
+            10.0,
+            lane_type_compatibility=training_types,
+        )

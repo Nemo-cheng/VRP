@@ -259,10 +259,6 @@ def optimize_instances(
         lane_types = tasks.groupby(
             ["origin_site_id", "destination_site_id"]
         )["vehicle_type_name"].agg(lambda values: set(values.dropna()))
-    task_types = {
-        row.task_id: lane_types[(row.origin_site_id, row.destination_site_id)]
-        for row in tasks.itertuples(index=False)
-    }
     task_instances = tasks.merge(
         instances[["instance_id", "service_date", "component_id", "qualifies_for_vrp"]],
         on=["service_date", "component_id"],
@@ -270,6 +266,14 @@ def optimize_instances(
         validate="many_to_one",
     )
     qualified = task_instances[task_instances["qualifies_for_vrp"] == True]  # noqa: E712
+    task_types: dict[str, set[str]] = {}
+    for row in qualified.itertuples(index=False):
+        lane = (row.origin_site_id, row.destination_site_id)
+        if lane not in lane_types.index:
+            raise ValueError(
+                f"Qualified task {row.task_id} has no vehicle-type evidence for lane {lane}"
+            )
+        task_types[row.task_id] = lane_types[lane]
     basic_lookup = basic_metrics.set_index("instance_id")
     metric_rows: list[dict[str, object]] = []
     schedule_parts: list[pd.DataFrame] = []
