@@ -53,6 +53,7 @@
   ],
   "best_scenario_with_no_more_deadhead_than_history": {
     "scenario": "vehicle_cost_89_km",
+    "vehicle_cost_equivalent_km": 89.0,
     "vehicle_count": 861,
     "vehicle_reduction": 152,
     "vehicle_reduction_rate": 0.15004935834155972,

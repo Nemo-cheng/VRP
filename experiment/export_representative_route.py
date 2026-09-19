@@ -27,6 +27,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--result-dir", type=Path, default=Path("results/company_transport")
     )
+    parser.add_argument("--output-prefix", default="representative_vehicle_route")
+    parser.add_argument("--solution-label", default="time_dependent_vrp")
     return parser.parse_args()
 
 
@@ -51,6 +53,8 @@ def select_representative_route(schedule: pd.DataFrame) -> pd.DataFrame:
     route["arrived_at"] = pd.to_datetime(route["arrived_at"])
     route_start = route["departed_at"].min()
     route["task_label"] = [f"task_{index:02d}" for index in range(1, len(route) + 1)]
+    task_labels = dict(zip(route["task_id"], route["task_label"], strict=True))
+    route["next_task_label"] = route["next_task_id"].map(task_labels)
     route["departure_offset_hours"] = (
         route["departed_at"] - route_start
     ).dt.total_seconds() / 3600
@@ -75,7 +79,7 @@ def select_representative_route(schedule: pd.DataFrame) -> pd.DataFrame:
             "distance_km",
             "departure_offset_hours",
             "arrival_offset_hours",
-            "next_task_id",
+            "next_task_label",
             "deadhead_to_next_path",
             "deadhead_to_next_distance_km",
             "deadhead_to_next_duration_hours",
@@ -88,7 +92,7 @@ def summarize_route(route: pd.DataFrame) -> dict[str, object]:
     return {
         "source_only": "订单数据.xlsx",
         "privacy": "Dates, vehicle identifiers and original site names are omitted.",
-        "task_count": int(len(route)),
+        "task_count": len(route),
         "vehicle_type_name": str(route["vehicle_type_name"].iloc[0]),
         "loaded_distance_km": float(route["distance_km"].sum()),
         "internal_deadhead_distance_km": float(
@@ -98,9 +102,7 @@ def summarize_route(route: pd.DataFrame) -> dict[str, object]:
         "minimum_waiting_after_deadhead_hours": float(
             route["waiting_after_deadhead_hours"].dropna().min()
         ),
-        "vehicle_type_consistent": bool(
-            route["vehicle_type_name"].nunique() == 1
-        ),
+        "vehicle_type_consistent": bool(route["vehicle_type_name"].nunique() == 1),
         "all_deadhead_links_time_feasible": bool(
             route["waiting_after_deadhead_hours"].dropna().ge(0).all()
         ),
@@ -112,12 +114,13 @@ def main() -> None:
     schedule = pd.read_csv(args.schedule, low_memory=False)
     route = select_representative_route(schedule)
     summary = summarize_route(route)
+    summary["solution_label"] = args.solution_label
     route.to_csv(
-        args.result_dir / "representative_vehicle_route.csv",
+        args.result_dir / f"{args.output_prefix}.csv",
         index=False,
         encoding="utf-8-sig",
     )
-    (args.result_dir / "representative_vehicle_route.json").write_text(
+    (args.result_dir / f"{args.output_prefix}.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2))

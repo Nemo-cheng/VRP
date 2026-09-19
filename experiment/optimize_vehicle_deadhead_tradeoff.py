@@ -194,6 +194,37 @@ def historical_chain_metrics(
     }
 
 
+def build_scenario_schedule(
+    qualified_tasks: pd.DataFrame,
+    task_types: dict[str, set[str]],
+    links: pd.DataFrame,
+    vehicle_cost_equivalent_km: float,
+    time_limit: float,
+) -> pd.DataFrame:
+    schedule_parts: list[pd.DataFrame] = []
+    for instance_id, group in qualified_tasks.groupby("instance_id", sort=True):
+        instance_links = links[links["instance_id"] == instance_id]
+        assignments, selected, diagnostics = solve_type_compatible_path_cover(
+            group["task_id"].astype(str).tolist(),
+            task_types,
+            instance_links,
+            time_limit,
+            vehicle_cost_equivalent_km,
+        )
+        if not diagnostics["solver_success"]:
+            raise RuntimeError(f"Recommended scenario failed for {instance_id}")
+        route, validation = attach_route_details(assignments, selected, group)
+        if any(validation.values()):
+            raise ValueError(
+                f"Recommended scenario has route violations for {instance_id}: "
+                f"{validation}"
+            )
+        route["instance_id"] = instance_id
+        route["vehicle_cost_equivalent_km"] = vehicle_cost_equivalent_km
+        schedule_parts.append(route)
+    return pd.concat(schedule_parts, ignore_index=True)
+
+
 def mark_pareto_frontier(table: pd.DataFrame) -> pd.DataFrame:
     result = table.copy()
     result["pareto_efficient"] = False
@@ -284,6 +315,9 @@ def run_tradeoff(
         ].tolist(),
         "best_scenario_with_no_more_deadhead_than_history": {
             "scenario": best_no_more_deadhead["scenario"],
+            "vehicle_cost_equivalent_km": float(
+                best_no_more_deadhead["vehicle_cost_equivalent_km"]
+            ),
             "vehicle_count": int(best_no_more_deadhead["vehicle_count"]),
             "vehicle_reduction": int(
                 historical["vehicle_count"] - best_no_more_deadhead["vehicle_count"]
@@ -344,6 +378,16 @@ def main() -> None:
         args.time_limit,
         args.travel_time_stat,
     )
+    recommended_cost = report["best_scenario_with_no_more_deadhead_than_history"][
+        "vehicle_cost_equivalent_km"
+    ]
+    recommended_schedule = build_scenario_schedule(
+        qualified,
+        task_types,
+        links,
+        float(recommended_cost),
+        args.time_limit,
+    )
 
     frontier.to_csv(
         args.result_dir / f"{output_prefix}.csv",
@@ -352,6 +396,11 @@ def main() -> None:
     )
     instance_metrics.to_csv(
         args.result_dir / f"{output_prefix}_instances.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    recommended_schedule.to_csv(
+        args.data_dir / f"recommended_{args.travel_time_stat}_vrp_schedules.csv",
         index=False,
         encoding="utf-8-sig",
     )

@@ -1,5 +1,4 @@
 import pandas as pd
-
 from export_representative_route import select_representative_route, summarize_route
 
 
@@ -8,6 +7,7 @@ def test_exports_longest_route_with_relative_time() -> None:
         {
             "instance_id": ["i1", "i1", "i2"],
             "vehicle_id": ["v1", "v1", "v2"],
+            "task_id": ["a", "b", "x"],
             "sequence": [1, 2, 1],
             "vehicle_type_name": ["small", "small", "large"],
             "origin_site_id": ["A", "C", "X"],
@@ -36,6 +36,8 @@ def test_exports_longest_route_with_relative_time() -> None:
 
     assert len(route) == 2
     assert route.loc[0, "departure_offset_hours"] == 0.0
+    assert route.loc[0, "next_task_label"] == "task_02"
+    assert "next_task_id" not in route.columns
     assert route.loc[0, "waiting_after_deadhead_hours"] == 0.5
     assert summary["loaded_distance_km"] == 30.0
     assert summary["all_deadhead_links_time_feasible"]

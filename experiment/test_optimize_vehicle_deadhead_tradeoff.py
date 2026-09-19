@@ -1,5 +1,6 @@
 import pandas as pd
 from optimize_vehicle_deadhead_tradeoff import (
+    build_scenario_schedule,
     evaluate_scenario,
     historical_chain_metrics,
     mark_pareto_frontier,
@@ -79,6 +80,12 @@ def test_scenario_moves_between_vehicle_and_deadhead_objectives() -> None:
     assert high["vehicle_count"] == 1
     assert high["internal_deadhead_distance_km"] == 50.0
     assert low["task_service_rate"] == high["task_service_rate"] == 1.0
+
+    schedule = build_scenario_schedule(tasks, task_types, links, 60.0, 10.0)
+
+    assert schedule["vehicle_id"].nunique() == 1
+    assert schedule["vehicle_cost_equivalent_km"].eq(60.0).all()
+    assert schedule.loc[0, "deadhead_to_next_path"] == "B>C"
 
 
 def test_historical_chain_distance_is_recomputed_from_verified_links() -> None:

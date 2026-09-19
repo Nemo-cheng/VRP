@@ -1,0 +1,13 @@
+{
+  "source_only": "订单数据.xlsx",
+  "privacy": "Dates, vehicle identifiers and original site names are omitted.",
+  "task_count": 4,
+  "vehicle_type_name": "4.2米厢式货车",
+  "loaded_distance_km": 189.31,
+  "internal_deadhead_distance_km": 56.0,
+  "route_elapsed_hours": 16.397777777777776,
+  "minimum_waiting_after_deadhead_hours": 2.2464444447227776,
+  "vehicle_type_consistent": true,
+  "all_deadhead_links_time_feasible": true,
+  "solution_label": "p90_vehicle_cost_89_km"
+}
