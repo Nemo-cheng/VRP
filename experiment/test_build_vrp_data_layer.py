@@ -55,3 +55,6 @@ def test_builds_time_feasible_task_links() -> None:
     assert instances.loc[0, "linkable_task_count"] == 2
     assert bool(instances.loc[0, "qualifies_for_vrp"])
     assert ((links["from_task_id"] == "e1") & (links["to_task_id"] == "e2")).any()
+    link = links.query("from_task_id == 'e1' and to_task_id == 'e2'").iloc[0]
+    assert link["deadhead_distance_km"] == 0.0
+    assert link["deadhead_path"] == "B"

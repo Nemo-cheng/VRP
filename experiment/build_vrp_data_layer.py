@@ -133,14 +133,28 @@ def assign_components(tasks: pd.DataFrame, graph: nx.DiGraph) -> pd.DataFrame:
     return assigned
 
 
-def shortest_duration_lookup(graph: nx.DiGraph, origins: set[str]) -> dict[str, dict[str, float]]:
-    return {
-        origin: nx.single_source_dijkstra_path_length(
+def deadhead_route_lookup(
+    graph: nx.DiGraph, origins: set[str]
+) -> dict[str, dict[str, tuple[float, float, list[str]]]]:
+    lookup: dict[str, dict[str, tuple[float, float, list[str]]]] = {}
+    for origin in origins:
+        if origin not in graph:
+            continue
+        durations, paths = nx.single_source_dijkstra(
             graph, origin, weight="duration_hours"
         )
-        for origin in origins
-        if origin in graph
-    }
+        lookup[origin] = {}
+        for destination, path in paths.items():
+            distance = sum(
+                float(graph.edges[start, end]["distance_km"])
+                for start, end in zip(path, path[1:])
+            )
+            lookup[origin][destination] = (
+                float(durations[destination]),
+                distance,
+                path,
+            )
+    return lookup
 
 
 def build_instances(
@@ -149,7 +163,7 @@ def build_instances(
     min_instance_tasks: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     covered = tasks[tasks["network_covered"]].copy()
-    durations = shortest_duration_lookup(
+    deadhead_routes = deadhead_route_lookup(
         graph, set(covered["destination_site_id"].dropna())
     )
     instance_rows: list[dict[str, object]] = []
@@ -162,13 +176,16 @@ def build_instances(
         linkable_tasks: set[str] = set()
         link_count_before = len(link_rows)
         for predecessor in records:
-            destination_lengths = durations.get(predecessor.destination_site_id, {})
+            destination_routes = deadhead_routes.get(
+                predecessor.destination_site_id, {}
+            )
             for successor in records:
                 if predecessor.task_id == successor.task_id:
                     continue
-                deadhead_hours = destination_lengths.get(successor.origin_site_id)
-                if deadhead_hours is None:
+                route = destination_routes.get(successor.origin_site_id)
+                if route is None:
                     continue
+                deadhead_hours, deadhead_distance_km, deadhead_path = route
                 ready_at = predecessor.arrived_at + pd.to_timedelta(
                     deadhead_hours, unit="h"
                 )
@@ -180,6 +197,8 @@ def build_instances(
                             "from_task_id": predecessor.task_id,
                             "to_task_id": successor.task_id,
                             "deadhead_duration_hours_p50": deadhead_hours,
+                            "deadhead_distance_km": deadhead_distance_km,
+                            "deadhead_path": ">".join(deadhead_path),
                             "available_slack_hours": (
                                 successor.departed_at - ready_at
                             ).total_seconds()
