@@ -4,13 +4,16 @@
     "independent tasks versus basic VRP",
     "basic VRP versus empirical vehicle-type-compatible VRP",
     "static versus time-dependent vehicle-type-compatible VRP",
-    "network observation threshold sensitivity at 5, 10 and 20"
+    "network observation threshold sensitivity at 5, 10 and 20",
+    "historical vehicle assignments versus P50 and P90 VRP on chronological holdout"
   ],
   "gate_checks": {
     "all_reported_vrp_solutions_feasible": true,
     "basic_vrp_effect_stable_across_thresholds": true,
     "loaded_path_selection_has_sufficient_coverage": false,
-    "chronological_holdout_feasible": true
+    "chronological_holdout_feasible": true,
+    "historical_baseline_improved_by_p50_vrp": true,
+    "historical_baseline_improved_by_p90_vrp": true
   },
   "main_findings": {
     "basic_vehicle_reduction_rate_range": [
@@ -61,7 +64,12 @@
     "p90_removed_candidate_links": 141,
     "p90_task_service_rate": 1.0,
     "p90_time_overlap_violations": 0,
-    "p90_all_instances_solved": true
+    "p90_all_instances_solved": true,
+    "raw_historical_vehicle_count": 983,
+    "p50_historical_chain_count": 1011,
+    "p90_historical_chain_count": 1013,
+    "p50_vehicle_reduction_vs_historical_chains": 0.18793273986152326,
+    "p90_vehicle_reduction_vs_historical_chains": 0.17867719644619942
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
 }

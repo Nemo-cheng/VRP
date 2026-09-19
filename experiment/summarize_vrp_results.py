@@ -64,13 +64,9 @@ def summarize_threshold(directory: Path, threshold: int) -> dict[str, object]:
             - robust_p90["p50_time_dependent_vehicle_count"]
         )
         / robust_p90["p50_time_dependent_vehicle_count"],
-        "p90_removed_candidate_links": robust_p90[
-            "links_removed_by_time_dependence"
-        ],
+        "p90_removed_candidate_links": robust_p90["links_removed_by_time_dependence"],
         "p90_task_service_rate": robust_p90["task_service_rate"],
-        "p90_time_overlap_violations": robust_p90[
-            "time_overlap_violations"
-        ],
+        "p90_time_overlap_violations": robust_p90["time_overlap_violations"],
         "alternative_path_task_share": paths["alternative_path_task_share"],
         "task_service_rate": time_dependent["task_service_rate"],
         "route_type_violations": time_dependent["route_type_violations"],
@@ -84,38 +80,38 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
     vehicle_type = read_json(directory / "type_compatible_vrp_summary.json")
     time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
     robust_p90 = read_json(directory / "robust_p90_vrp_summary.json")
+    historical = read_json(directory / "historical_vehicle_baseline_summary.json")
     return {
         "protocol": readiness["validation_protocol"],
         "qualified_instances": readiness["instances"]["qualified_instances"],
         "qualified_tasks": readiness["instances"]["qualified_tasks"],
         "basic_vehicle_reduction_rate": basic["vehicle_reduction_rate"],
         "basic_vrp_vehicle_count": basic["vrp_vehicle_count"],
-        "type_compatible_vehicle_count": vehicle_type[
-            "type_compatible_vehicle_count"
-        ],
-        "time_dependent_vehicle_count": time_dependent[
-            "time_dependent_vehicle_count"
-        ],
+        "type_compatible_vehicle_count": vehicle_type["type_compatible_vehicle_count"],
+        "time_dependent_vehicle_count": time_dependent["time_dependent_vehicle_count"],
         "links_removed_by_time_dependence": time_dependent[
             "links_removed_by_time_dependence"
         ],
         "task_service_rate": time_dependent["task_service_rate"],
         "route_type_violations": time_dependent["route_type_violations"],
         "time_overlap_violations": time_dependent["time_overlap_violations"],
-        "deadhead_endpoint_violations": time_dependent[
-            "deadhead_endpoint_violations"
-        ],
+        "deadhead_endpoint_violations": time_dependent["deadhead_endpoint_violations"],
         "all_instances_solved": time_dependent["all_instances_solved"],
         "p90_robust_vehicle_count": robust_p90["p90_robust_vehicle_count"],
         "p90_vehicles_added": robust_p90["vehicles_added_by_p90_robustness"],
-        "p90_removed_candidate_links": robust_p90[
-            "links_removed_by_time_dependence"
-        ],
+        "p90_removed_candidate_links": robust_p90["links_removed_by_time_dependence"],
         "p90_task_service_rate": robust_p90["task_service_rate"],
-        "p90_time_overlap_violations": robust_p90[
-            "time_overlap_violations"
-        ],
+        "p90_time_overlap_violations": robust_p90["time_overlap_violations"],
         "p90_all_instances_solved": robust_p90["all_instances_solved"],
+        "raw_historical_vehicle_count": historical["raw_historical_vehicle_count"],
+        "p50_historical_chain_count": historical["p50_historical_chain_count"],
+        "p90_historical_chain_count": historical["p90_historical_chain_count"],
+        "p50_vehicle_reduction_vs_historical_chains": historical[
+            "p50_vehicle_reduction_vs_historical_chains"
+        ],
+        "p90_vehicle_reduction_vs_historical_chains": historical[
+            "p90_vehicle_reduction_vs_historical_chains"
+        ],
     }
 
 
@@ -125,7 +121,10 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
         10: result_dir,
         20: result_dir / "sensitivity" / "edge20",
     }
-    rows = [summarize_threshold(directory, threshold) for threshold, directory in directories.items()]
+    rows = [
+        summarize_threshold(directory, threshold)
+        for threshold, directory in directories.items()
+    ]
     table = pd.DataFrame(rows).sort_values("min_edge_observations")
     all_feasible = bool(
         table["task_service_rate"].eq(1.0).all()
@@ -158,12 +157,21 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "basic VRP versus empirical vehicle-type-compatible VRP",
             "static versus time-dependent vehicle-type-compatible VRP",
             "network observation threshold sensitivity at 5, 10 and 20",
+            "historical vehicle assignments versus P50 and P90 VRP on chronological holdout",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
             "basic_vrp_effect_stable_across_thresholds": stable_basic_effect,
             "loaded_path_selection_has_sufficient_coverage": path_selection_supported,
             "chronological_holdout_feasible": holdout_feasible,
+            "historical_baseline_improved_by_p50_vrp": holdout[
+                "p50_vehicle_reduction_vs_historical_chains"
+            ]
+            > 0,
+            "historical_baseline_improved_by_p90_vrp": holdout[
+                "p90_vehicle_reduction_vs_historical_chains"
+            ]
+            > 0,
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [

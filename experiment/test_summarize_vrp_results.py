@@ -98,6 +98,16 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "all_instances_solved": True,
         },
     )
+    write_json(
+        holdout / "historical_vehicle_baseline_summary.json",
+        {
+            "raw_historical_vehicle_count": 95,
+            "p50_historical_chain_count": 98,
+            "p90_historical_chain_count": 100,
+            "p50_vehicle_reduction_vs_historical_chains": 0.16,
+            "p90_vehicle_reduction_vs_historical_chains": 0.16,
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -106,3 +116,6 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
     assert not report["decision"]["use_loaded_path_choice_as_main_experiment"]
     assert report["gate_checks"]["chronological_holdout_feasible"]
     assert report["main_findings"]["p90_always_increases_vehicle_count"]
+    assert report["gate_checks"]["historical_baseline_improved_by_p50_vrp"]
+    assert report["gate_checks"]["historical_baseline_improved_by_p90_vrp"]
+    assert report["chronological_holdout"]["raw_historical_vehicle_count"] == 95
