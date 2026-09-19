@@ -1,0 +1,12 @@
+{
+  "source": "订单数据.xlsx",
+  "orders": 12098,
+  "waybill_rows": 36329,
+  "transport_events": 12167,
+  "eligible_events": 10975,
+  "lane_count": 3061,
+  "lane_day_rows": 10331,
+  "vehicle_type_conflicts": 1080,
+  "receiver_city_field_used": "receiver_city_name（收货地省名称）",
+  "privacy_note": "Raw vehicle, waybill and site names remain in ignored processed outputs; public summaries use anonymized site and lane IDs."
+}
