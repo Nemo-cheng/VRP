@@ -140,6 +140,15 @@ def main() -> None:
             / metrics["task_count"].sum()
         ),
         "route_type_violations": int(metrics["route_type_violations"].sum()),
+        "time_overlap_violations": int(
+            metrics["time_overlap_violations"].sum()
+        ),
+        "deadhead_endpoint_violations": int(
+            metrics["deadhead_endpoint_violations"].sum()
+        ),
+        "missing_selected_link_paths": int(
+            metrics["missing_selected_link_paths"].sum()
+        ),
         "all_instances_solved": bool(metrics["solver_success"].all()),
     }
     time_links.to_csv(

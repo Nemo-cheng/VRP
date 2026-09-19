@@ -172,6 +172,75 @@ def solve_type_compatible_path_cover(
     return pd.DataFrame(assignment_rows), selected, diagnostics
 
 
+def attach_route_details(
+    assignments: pd.DataFrame,
+    selected: pd.DataFrame,
+    tasks: pd.DataFrame,
+) -> tuple[pd.DataFrame, dict[str, int]]:
+    route = assignments.merge(
+        tasks[
+            [
+                "task_id",
+                "origin_site_id",
+                "destination_site_id",
+                "departed_at",
+                "arrived_at",
+                "distance_km",
+            ]
+        ],
+        on="task_id",
+        how="left",
+        validate="one_to_one",
+    )
+    route["loaded_path"] = route["origin_site_id"] + ">" + route["destination_site_id"]
+    detail_columns = {
+        "to_task_id": "next_task_id",
+        "deadhead_path": "deadhead_to_next_path",
+        "deadhead_distance_km": "deadhead_to_next_distance_km",
+        "deadhead_duration_hours_p50": "deadhead_to_next_duration_hours",
+    }
+    if selected.empty:
+        for output_column in detail_columns.values():
+            route[output_column] = pd.NA
+    else:
+        selected_lookup = selected.set_index("from_task_id")
+        for input_column, output_column in detail_columns.items():
+            route[output_column] = route["task_id"].map(selected_lookup[input_column])
+    route["deadhead_to_next_distance_km"] = pd.to_numeric(
+        route["deadhead_to_next_distance_km"], errors="coerce"
+    ).fillna(0.0)
+    route["deadhead_to_next_duration_hours"] = pd.to_numeric(
+        route["deadhead_to_next_duration_hours"], errors="coerce"
+    ).fillna(0.0)
+
+    task_lookup = tasks.set_index("task_id")
+    time_violations = 0
+    endpoint_violations = 0
+    missing_paths = 0
+    for link in selected.itertuples(index=False):
+        ready_at = pd.to_datetime(task_lookup.loc[link.from_task_id, "arrived_at"])
+        ready_at += pd.to_timedelta(link.deadhead_duration_hours_p50, unit="h")
+        next_departure = pd.to_datetime(
+            task_lookup.loc[link.to_task_id, "departed_at"]
+        )
+        time_violations += int(ready_at > next_departure)
+        if pd.isna(link.deadhead_path):
+            missing_paths += 1
+            continue
+        path_nodes = str(link.deadhead_path).split(">")
+        expected_origin = task_lookup.loc[link.from_task_id, "destination_site_id"]
+        expected_destination = task_lookup.loc[link.to_task_id, "origin_site_id"]
+        endpoint_violations += int(
+            path_nodes[0] != expected_origin or path_nodes[-1] != expected_destination
+        )
+    validation = {
+        "time_overlap_violations": time_violations,
+        "deadhead_endpoint_violations": endpoint_violations,
+        "missing_selected_link_paths": missing_paths,
+    }
+    return route, validation
+
+
 def optimize_instances(
     tasks: pd.DataFrame,
     instances: pd.DataFrame,
@@ -208,22 +277,10 @@ def optimize_instances(
         assignments, selected, diagnostics = solve_type_compatible_path_cover(
             task_ids, task_types, instance_links, time_limit
         )
-        assignments["instance_id"] = instance_id
-        assignments = assignments.merge(
-            group[
-                [
-                    "task_id",
-                    "origin_site_id",
-                    "destination_site_id",
-                    "departed_at",
-                    "arrived_at",
-                    "distance_km",
-                ]
-            ],
-            on="task_id",
-            how="left",
-            validate="one_to_one",
+        assignments, validation = attach_route_details(
+            assignments, selected, group
         )
+        assignments["instance_id"] = instance_id
         schedule_parts.append(assignments)
         vehicle_count = assignments["vehicle_id"].nunique()
         metric_rows.append(
@@ -249,6 +306,7 @@ def optimize_instances(
                 "route_type_violations": int(
                     (assignments.groupby("vehicle_id")["vehicle_type_name"].nunique() > 1).sum()
                 ),
+                **validation,
                 "solver_success": diagnostics["solver_success"],
                 "optimality_gap": diagnostics["optimality_gap"],
             }
@@ -279,6 +337,15 @@ def optimize_instances(
             metrics["duplicate_task_assignments"].sum()
         ),
         "route_type_violations": int(metrics["route_type_violations"].sum()),
+        "time_overlap_violations": int(
+            metrics["time_overlap_violations"].sum()
+        ),
+        "deadhead_endpoint_violations": int(
+            metrics["deadhead_endpoint_violations"].sum()
+        ),
+        "missing_selected_link_paths": int(
+            metrics["missing_selected_link_paths"].sum()
+        ),
         "all_instances_solved": bool(metrics["solver_success"].all()),
     }
     return metrics, schedules, summary

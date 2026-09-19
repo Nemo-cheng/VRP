@@ -1,0 +1,12 @@
+{
+  "source_only": "订单数据.xlsx",
+  "privacy": "Dates, vehicle identifiers and original site names are omitted.",
+  "task_count": 5,
+  "vehicle_type_name": "9.6米厢式货车",
+  "loaded_distance_km": 236.0,
+  "internal_deadhead_distance_km": 120.0,
+  "route_elapsed_hours": 23.0575,
+  "minimum_waiting_after_deadhead_hours": 0.2280555555552778,
+  "vehicle_type_consistent": true,
+  "all_deadhead_links_time_feasible": true
+}

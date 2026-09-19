@@ -14,5 +14,8 @@
   "internal_deadhead_distance_km": 21629.61,
   "task_service_rate": 1.0,
   "route_type_violations": 0,
+  "time_overlap_violations": 0,
+  "deadhead_endpoint_violations": 0,
+  "missing_selected_link_paths": 0,
   "all_instances_solved": true
 }
