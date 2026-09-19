@@ -108,6 +108,21 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "p90_vehicle_reduction_vs_historical_chains": 0.16,
         },
     )
+    write_json(
+        holdout / "vehicle_deadhead_tradeoff_summary.json",
+        {
+            "historical_p50_chain_deadhead_distance_km": 40.0,
+            "best_scenario_with_no_more_deadhead_than_history": {
+                "scenario": "vehicle_cost_50_km",
+                "vehicle_count": 80,
+                "vehicle_reduction": 18,
+                "vehicle_reduction_rate": 18 / 98,
+                "internal_deadhead_distance_km": 30.0,
+                "deadhead_reduction_km": 10.0,
+            },
+            "all_scenarios_feasible": True,
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -119,3 +134,10 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
     assert report["gate_checks"]["historical_baseline_improved_by_p50_vrp"]
     assert report["gate_checks"]["historical_baseline_improved_by_p90_vrp"]
     assert report["chronological_holdout"]["raw_historical_vehicle_count"] == 95
+    assert report["gate_checks"]["vehicle_and_deadhead_both_improved_over_history"]
+    assert (
+        report["chronological_holdout"]["best_no_more_deadhead_scenario"][
+            "vehicle_count"
+        ]
+        == 80
+    )

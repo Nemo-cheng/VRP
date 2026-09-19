@@ -81,6 +81,7 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
     time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
     robust_p90 = read_json(directory / "robust_p90_vrp_summary.json")
     historical = read_json(directory / "historical_vehicle_baseline_summary.json")
+    tradeoff = read_json(directory / "vehicle_deadhead_tradeoff_summary.json")
     return {
         "protocol": readiness["validation_protocol"],
         "qualified_instances": readiness["instances"]["qualified_instances"],
@@ -112,6 +113,13 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
         "p90_vehicle_reduction_vs_historical_chains": historical[
             "p90_vehicle_reduction_vs_historical_chains"
         ],
+        "historical_p50_chain_deadhead_distance_km": tradeoff[
+            "historical_p50_chain_deadhead_distance_km"
+        ],
+        "best_no_more_deadhead_scenario": tradeoff[
+            "best_scenario_with_no_more_deadhead_than_history"
+        ],
+        "all_tradeoff_scenarios_feasible": tradeoff["all_scenarios_feasible"],
     }
 
 
@@ -158,6 +166,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "static versus time-dependent vehicle-type-compatible VRP",
             "network observation threshold sensitivity at 5, 10 and 20",
             "historical vehicle assignments versus P50 and P90 VRP on chronological holdout",
+            "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
@@ -172,6 +181,12 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
                 "p90_vehicle_reduction_vs_historical_chains"
             ]
             > 0,
+            "vehicle_and_deadhead_both_improved_over_history": (
+                holdout["best_no_more_deadhead_scenario"]["vehicle_reduction"] > 0
+                and holdout["best_no_more_deadhead_scenario"]["deadhead_reduction_km"]
+                > 0
+                and holdout["all_tradeoff_scenarios_feasible"]
+            ),
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [
