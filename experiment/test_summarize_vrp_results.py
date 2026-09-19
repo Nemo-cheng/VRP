@@ -123,6 +123,21 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "all_scenarios_feasible": True,
         },
     )
+    write_json(
+        holdout / "robust_p90_vehicle_deadhead_tradeoff_summary.json",
+        {
+            "historical_p90_chain_deadhead_distance_km": 42.0,
+            "best_scenario_with_no_more_deadhead_than_history": {
+                "scenario": "vehicle_cost_60_km",
+                "vehicle_count": 82,
+                "vehicle_reduction": 18,
+                "vehicle_reduction_rate": 0.18,
+                "internal_deadhead_distance_km": 40.0,
+                "deadhead_reduction_km": 2.0,
+            },
+            "all_scenarios_feasible": True,
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -140,4 +155,11 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "vehicle_count"
         ]
         == 80
+    )
+    assert report["gate_checks"]["p90_vehicle_and_deadhead_both_improved_over_history"]
+    assert (
+        report["chronological_holdout"]["best_p90_no_more_deadhead_scenario"][
+            "vehicle_count"
+        ]
+        == 82
     )

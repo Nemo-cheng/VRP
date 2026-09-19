@@ -15,7 +15,8 @@
     "chronological_holdout_feasible": true,
     "historical_baseline_improved_by_p50_vrp": true,
     "historical_baseline_improved_by_p90_vrp": true,
-    "vehicle_and_deadhead_both_improved_over_history": true
+    "vehicle_and_deadhead_both_improved_over_history": true,
+    "p90_vehicle_and_deadhead_both_improved_over_history": true
   },
   "main_findings": {
     "basic_vehicle_reduction_rate_range": [
@@ -81,7 +82,17 @@
       "internal_deadhead_distance_km": 3626.52,
       "deadhead_reduction_km": 77.63000000000056
     },
-    "all_tradeoff_scenarios_feasible": true
+    "all_tradeoff_scenarios_feasible": true,
+    "historical_p90_chain_deadhead_distance_km": 3463.1500000000005,
+    "best_p90_no_more_deadhead_scenario": {
+      "scenario": "vehicle_cost_89_km",
+      "vehicle_count": 861,
+      "vehicle_reduction": 152,
+      "vehicle_reduction_rate": 0.15004935834155972,
+      "internal_deadhead_distance_km": 3455.44,
+      "deadhead_reduction_km": 7.710000000000491
+    },
+    "all_p90_tradeoff_scenarios_feasible": true
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
 }
