@@ -1,0 +1,14 @@
+{
+  "source_only": "订单数据.xlsx",
+  "vehicle_type_interpretation": "A vehicle type is eligible for a task only when that type appears historically on the same directed lane.",
+  "instances": 52,
+  "tasks": 2042,
+  "basic_vrp_vehicle_count": 1493,
+  "type_compatible_vehicle_count": 1570,
+  "vehicles_added_by_type_compatibility": 77,
+  "internal_deadhead_distance_km": 18771.830000000005,
+  "task_service_rate": 1.0,
+  "duplicate_task_assignments": 0,
+  "route_type_violations": 0,
+  "all_instances_solved": true
+}

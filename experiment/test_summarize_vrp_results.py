@@ -1,0 +1,54 @@
+import json
+from pathlib import Path
+
+from summarize_vrp_results import build_summary
+
+
+def write_json(path: Path, value: dict[str, object]) -> None:
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+
+def make_result_set(directory: Path, alternative_share: float) -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    write_json(
+        directory / "vrp_data_readiness.json",
+        {
+            "tasks": {"network_covered_tasks": 100},
+            "instances": {"qualified_instances": 20, "qualified_tasks": 100},
+        },
+    )
+    write_json(
+        directory / "basic_vrp_summary.json",
+        {"vrp_vehicle_count": 75, "vehicle_reduction_rate": 0.25},
+    )
+    write_json(
+        directory / "type_compatible_vrp_summary.json",
+        {"type_compatible_vehicle_count": 80},
+    )
+    write_json(
+        directory / "time_dependent_vrp_summary.json",
+        {
+            "time_dependent_vehicle_count": 82,
+            "links_removed_by_time_dependence": 3,
+            "internal_deadhead_distance_km": 10.0,
+            "task_service_rate": 1.0,
+            "route_type_violations": 0,
+            "all_instances_solved": True,
+        },
+    )
+    write_json(
+        directory / "task_path_option_summary.json",
+        {"alternative_path_task_share": alternative_share},
+    )
+
+
+def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> None:
+    make_result_set(tmp_path, 0.01)
+    make_result_set(tmp_path / "sensitivity" / "edge5", 0.02)
+    make_result_set(tmp_path / "sensitivity" / "edge20", 0.005)
+
+    table, report = build_summary(tmp_path)
+
+    assert len(table) == 3
+    assert report["decision"]["proceed_with_vrp_comparison"]
+    assert not report["decision"]["use_loaded_path_choice_as_main_experiment"]

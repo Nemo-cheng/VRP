@@ -1,0 +1,4 @@
+﻿min_edge_observations,network_covered_tasks,qualified_instances,qualified_tasks,basic_vehicle_reduction_rate,basic_vrp_vehicle_count,type_compatible_vehicle_count,type_constraint_vehicle_increase_rate,time_dependent_vehicle_count,time_constraint_vehicle_increase_rate,links_removed_by_time_dependence,time_dependent_deadhead_distance_km,alternative_path_task_share,task_service_rate,route_type_violations,all_instances_solved
+5,6865,90,6572,0.25578210590383443,4891,5263,0.07605806583520752,5294,0.005890176705301159,658,46704.630000000005,0.01034231609613984,1.0,0,True
+10,4670,77,4225,0.2657988165680473,3102,3370,0.08639587362991619,3399,0.008605341246290801,407,21629.61,0.008779443254817988,1.0,0,True
+20,3080,52,2042,0.26885406464250733,1493,1570,0.05157401205626256,1594,0.015286624203821656,204,16958.21,0.005844155844155844,1.0,0,True

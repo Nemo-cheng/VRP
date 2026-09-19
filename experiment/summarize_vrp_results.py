@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""Combine the Excel-only VRP experiment stages into one audit summary."""
+
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "pandas>=2.2",
+# ]
+# ///
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import pandas as pd
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="汇总 VRP 实验结果。")
+    parser.add_argument(
+        "--result-dir", type=Path, default=Path("results/company_transport")
+    )
+    return parser.parse_args()
+
+
+def read_json(path: Path) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def summarize_threshold(directory: Path, threshold: int) -> dict[str, object]:
+    readiness = read_json(directory / "vrp_data_readiness.json")
+    basic = read_json(directory / "basic_vrp_summary.json")
+    vehicle_type = read_json(directory / "type_compatible_vrp_summary.json")
+    time_dependent = read_json(directory / "time_dependent_vrp_summary.json")
+    paths = read_json(directory / "task_path_option_summary.json")
+    basic_vehicles = int(basic["vrp_vehicle_count"])
+    type_vehicles = int(vehicle_type["type_compatible_vehicle_count"])
+    time_vehicles = int(time_dependent["time_dependent_vehicle_count"])
+    return {
+        "min_edge_observations": threshold,
+        "network_covered_tasks": readiness["tasks"]["network_covered_tasks"],
+        "qualified_instances": readiness["instances"]["qualified_instances"],
+        "qualified_tasks": readiness["instances"]["qualified_tasks"],
+        "basic_vehicle_reduction_rate": basic["vehicle_reduction_rate"],
+        "basic_vrp_vehicle_count": basic_vehicles,
+        "type_compatible_vehicle_count": type_vehicles,
+        "type_constraint_vehicle_increase_rate": (type_vehicles - basic_vehicles)
+        / basic_vehicles,
+        "time_dependent_vehicle_count": time_vehicles,
+        "time_constraint_vehicle_increase_rate": (time_vehicles - type_vehicles)
+        / type_vehicles,
+        "links_removed_by_time_dependence": time_dependent[
+            "links_removed_by_time_dependence"
+        ],
+        "time_dependent_deadhead_distance_km": time_dependent[
+            "internal_deadhead_distance_km"
+        ],
+        "alternative_path_task_share": paths["alternative_path_task_share"],
+        "task_service_rate": time_dependent["task_service_rate"],
+        "route_type_violations": time_dependent["route_type_violations"],
+        "all_instances_solved": time_dependent["all_instances_solved"],
+    }
+
+
+def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
+    directories = {
+        5: result_dir / "sensitivity" / "edge5",
+        10: result_dir,
+        20: result_dir / "sensitivity" / "edge20",
+    }
+    rows = [summarize_threshold(directory, threshold) for threshold, directory in directories.items()]
+    table = pd.DataFrame(rows).sort_values("min_edge_observations")
+    all_feasible = bool(
+        table["task_service_rate"].eq(1.0).all()
+        and table["route_type_violations"].eq(0).all()
+        and table["all_instances_solved"].all()
+    )
+    stable_basic_effect = bool(
+        table["basic_vehicle_reduction_rate"].between(0.20, 0.35).all()
+    )
+    path_selection_supported = bool(
+        (table["alternative_path_task_share"] >= 0.05).all()
+    )
+    report = {
+        "source_only": "订单数据.xlsx",
+        "completed_comparisons": [
+            "independent tasks versus basic VRP",
+            "basic VRP versus empirical vehicle-type-compatible VRP",
+            "static versus time-dependent vehicle-type-compatible VRP",
+            "network observation threshold sensitivity at 5, 10 and 20",
+        ],
+        "gate_checks": {
+            "all_reported_vrp_solutions_feasible": all_feasible,
+            "basic_vrp_effect_stable_across_thresholds": stable_basic_effect,
+            "loaded_path_selection_has_sufficient_coverage": path_selection_supported,
+        },
+        "main_findings": {
+            "basic_vehicle_reduction_rate_range": [
+                float(table["basic_vehicle_reduction_rate"].min()),
+                float(table["basic_vehicle_reduction_rate"].max()),
+            ],
+            "vehicle_type_compatibility_always_increases_vehicle_count": bool(
+                table["type_constraint_vehicle_increase_rate"].gt(0).all()
+            ),
+            "time_dependence_always_removes_static_links": bool(
+                table["links_removed_by_time_dependence"].gt(0).all()
+            ),
+            "alternative_path_share_range": [
+                float(table["alternative_path_task_share"].min()),
+                float(table["alternative_path_task_share"].max()),
+            ],
+        },
+        "decision": {
+            "proceed_with_vrp_comparison": all_feasible and stable_basic_effect,
+            "use_loaded_path_choice_as_main_experiment": path_selection_supported,
+            "loaded_path_choice_role": "supplementary analysis"
+            if not path_selection_supported
+            else "main experiment",
+        },
+        "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet.",
+    }
+    return table, report
+
+
+def main() -> None:
+    args = parse_args()
+    table, report = build_summary(args.result_dir)
+    table.to_csv(
+        args.result_dir / "vrp_robustness_summary.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    (args.result_dir / "vrp_experiment_summary.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

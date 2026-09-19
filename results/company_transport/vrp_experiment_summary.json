@@ -1,0 +1,32 @@
+{
+  "source_only": "订单数据.xlsx",
+  "completed_comparisons": [
+    "independent tasks versus basic VRP",
+    "basic VRP versus empirical vehicle-type-compatible VRP",
+    "static versus time-dependent vehicle-type-compatible VRP",
+    "network observation threshold sensitivity at 5, 10 and 20"
+  ],
+  "gate_checks": {
+    "all_reported_vrp_solutions_feasible": true,
+    "basic_vrp_effect_stable_across_thresholds": true,
+    "loaded_path_selection_has_sufficient_coverage": false
+  },
+  "main_findings": {
+    "basic_vehicle_reduction_rate_range": [
+      0.25578210590383443,
+      0.26885406464250733
+    ],
+    "vehicle_type_compatibility_always_increases_vehicle_count": true,
+    "time_dependence_always_removes_static_links": true,
+    "alternative_path_share_range": [
+      0.005844155844155844,
+      0.01034231609613984
+    ]
+  },
+  "decision": {
+    "proceed_with_vrp_comparison": true,
+    "use_loaded_path_choice_as_main_experiment": false,
+    "loaded_path_choice_role": "supplementary analysis"
+  },
+  "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
+}
