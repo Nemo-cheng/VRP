@@ -9,7 +9,8 @@
     "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
     "instance-level bootstrap validation of the recommended P90 solution",
     "November parameter selection followed by frozen December final testing",
-    "chronological greedy dispatch versus global P90 VRP on the independent final test"
+    "chronological greedy dispatch versus global P90 VRP on the independent final test",
+    "fixed historical vehicle types versus joint vehicle-type and route optimization"
   ],
   "gate_checks": {
     "all_reported_vrp_solutions_feasible": true,
@@ -25,7 +26,8 @@
     "independent_final_test_vehicle_ci_above_zero": true,
     "independent_final_test_has_no_vehicle_increase": true,
     "minimum_vehicle_p90_vrp_dominates_greedy": true,
-    "frozen_weighted_p90_vrp_improves_proxy_cost": true
+    "frozen_weighted_p90_vrp_improves_proxy_cost": true,
+    "joint_type_route_optimization_improves_fixed_type_planning": true
   },
   "main_findings": {
     "basic_vehicle_reduction_rate_range": [
@@ -266,6 +268,45 @@
       "reason": "The order data contain no observed vehicle fixed cost or per-kilometre operating cost, so they cannot identify a unique economic optimum.",
       "vehicle_cost_equivalent_km_role": "The frozen 75 km value identifies the independently selected compromise and is not an observed monetary cost.",
       "all_retained_solutions_feasible": true
+    },
+    "fixed_vs_joint_vehicle_routing": {
+      "source_only": "订单数据.xlsx",
+      "comparison": "Fixed observed task vehicle types versus joint empirical-compatible vehicle-type and route optimization on the independent December test.",
+      "travel_time_stat": "p90",
+      "vehicle_type_scope": "Joint choices are restricted to vehicle types observed on the same directed lane in training data.",
+      "minimum_vehicles_then_deadhead": {
+        "objective": "minimum_vehicles_then_deadhead",
+        "tasks": 731,
+        "instances": 23,
+        "fixed_historical_type_vehicle_count": 585,
+        "joint_type_route_vehicle_count": 565,
+        "joint_vehicle_reduction": 20,
+        "fixed_historical_type_deadhead_distance_km": 5889.53,
+        "joint_type_route_deadhead_distance_km": 6308.54,
+        "joint_deadhead_reduction_km": -419.0100000000002,
+        "instances_where_joint_uses_fewer_vehicles": 16,
+        "instances_where_vehicle_count_is_equal": 7,
+        "instances_where_joint_uses_more_vehicles": 0,
+        "both_solutions_feasible": true
+      },
+      "vehicle_cost_75_km": {
+        "objective": "vehicle_cost_75_km",
+        "tasks": 731,
+        "instances": 23,
+        "fixed_historical_type_vehicle_count": 614,
+        "joint_type_route_vehicle_count": 594,
+        "joint_vehicle_reduction": 20,
+        "fixed_historical_type_deadhead_distance_km": 1864.7,
+        "joint_type_route_deadhead_distance_km": 1850.9999999999998,
+        "joint_deadhead_reduction_km": 13.700000000000273,
+        "instances_where_joint_uses_fewer_vehicles": 16,
+        "instances_where_vehicle_count_is_equal": 7,
+        "instances_where_joint_uses_more_vehicles": 0,
+        "both_solutions_feasible": true,
+        "fixed_weighted_proxy_cost": 47914.7,
+        "joint_weighted_proxy_cost": 46401.0,
+        "joint_weighted_proxy_cost_reduction_rate": 0.031591557496968514
+      }
     }
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."

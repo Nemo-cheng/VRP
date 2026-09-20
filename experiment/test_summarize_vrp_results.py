@@ -214,6 +214,13 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             ],
         },
     )
+    write_json(
+        final_test / "fixed_vs_joint_vehicle_routing_summary.json",
+        {
+            "minimum_vehicles_then_deadhead": {"joint_vehicle_reduction": 2},
+            "vehicle_cost_75_km": {"joint_weighted_proxy_cost_reduction_rate": 0.03},
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -255,6 +262,9 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
     assert report["gate_checks"]["independent_final_test_has_no_vehicle_increase"]
     assert report["gate_checks"]["minimum_vehicle_p90_vrp_dominates_greedy"]
     assert report["gate_checks"]["frozen_weighted_p90_vrp_improves_proxy_cost"]
+    assert report["gate_checks"][
+        "joint_type_route_optimization_improves_fixed_type_planning"
+    ]
     assert (
         report["independent_parameter_validation"]["greedy_dispatch_comparison"][
             "greedy_vehicle_count"

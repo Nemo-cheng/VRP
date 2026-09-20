@@ -178,6 +178,9 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
     retained_solutions = read_json(
         result_dir / "final_test" / "retained_p90_solutions.json"
     )
+    fixed_vs_joint = read_json(
+        result_dir / "final_test" / "fixed_vs_joint_vehicle_routing_summary.json"
+    )
     selected = validation_choice["best_scenario_with_no_more_deadhead_than_history"]
     return {
         "validation_period": validation_readiness["validation_protocol"],
@@ -213,6 +216,7 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
         },
         "greedy_dispatch_comparison": greedy_comparison,
         "retained_solutions": retained_solutions,
+        "fixed_vs_joint_vehicle_routing": fixed_vs_joint,
     }
 
 
@@ -264,6 +268,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "instance-level bootstrap validation of the recommended P90 solution",
             "November parameter selection followed by frozen December final testing",
             "chronological greedy dispatch versus global P90 VRP on the independent final test",
+            "fixed historical vehicle types versus joint vehicle-type and route optimization",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
@@ -327,6 +332,16 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
                 "greedy_dispatch_comparison"
             ]["vrp_weighted_proxy_cost_reduction_rate"]
             > 0,
+            "joint_type_route_optimization_improves_fixed_type_planning": (
+                independent["fixed_vs_joint_vehicle_routing"][
+                    "minimum_vehicles_then_deadhead"
+                ]["joint_vehicle_reduction"]
+                > 0
+                and independent["fixed_vs_joint_vehicle_routing"]["vehicle_cost_75_km"][
+                    "joint_weighted_proxy_cost_reduction_rate"
+                ]
+                > 0
+            ),
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [
