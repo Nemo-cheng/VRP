@@ -1,0 +1,30 @@
+{
+  "source_only": "订单数据.xlsx",
+  "comparison": "Chronological greedy dispatch versus frozen P90 VRP on the independent December final test.",
+  "instances": 23,
+  "tasks": 731,
+  "greedy_vehicle_count": 570,
+  "vrp_vehicle_count": 594,
+  "vrp_vehicle_reduction_vs_greedy": -24,
+  "vrp_vehicle_reduction_rate_vs_greedy": -0.042105263157894736,
+  "greedy_internal_deadhead_distance_km": 7605.26,
+  "vrp_internal_deadhead_distance_km": 1850.9999999999998,
+  "vrp_deadhead_reduction_vs_greedy_km": 5754.26,
+  "vehicle_cost_equivalent_km": 75.0,
+  "greedy_weighted_proxy_cost": 50355.26,
+  "vrp_weighted_proxy_cost": 46401.0,
+  "vrp_weighted_proxy_cost_reduction_rate": 0.07852724819611699,
+  "minimum_vehicle_p90_vrp_vehicle_count": 565,
+  "minimum_vehicle_p90_vrp_deadhead_distance_km": 6308.54,
+  "minimum_vehicle_p90_vrp_vehicle_reduction_vs_greedy": 5,
+  "minimum_vehicle_p90_vrp_deadhead_reduction_vs_greedy_km": 1296.7200000000003,
+  "instances_where_vrp_uses_fewer_vehicles": 3,
+  "instances_where_vehicle_count_is_equal": 10,
+  "instances_where_vrp_uses_more_vehicles": 10,
+  "both_methods_task_service_rate": [
+    1.0,
+    1.0
+  ],
+  "greedy_constraint_violations": 0,
+  "vrp_constraint_violations": 0
+}
