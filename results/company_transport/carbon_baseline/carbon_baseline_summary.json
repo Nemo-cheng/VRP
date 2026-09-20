@@ -24,6 +24,33 @@
     "covered_emissions_tco2": 2487.8060995444716,
     "assumption": "观测活跃日的运输强度可代表全年，赛题未直接保证该假设。"
   },
+  "complete_baseline_sensitivity": {
+    "status": "sensitivity_only",
+    "coverage_share": 1.0,
+    "light_diesel_proxy_l_per_100km": {
+      "minimum": 12.264943457189014,
+      "maximum": 20.2
+    },
+    "light_diesel_emissions_tco2": {
+      "minimum": 98.21848724922899,
+      "maximum": 161.76295058837056
+    },
+    "existing_electric_energy_kwh_per_km": 0.53,
+    "existing_electric_emissions_tco2": 0.1259153595,
+    "observed_emissions_tco2": {
+      "minimum": 943.5168857416455,
+      "maximum": 1007.0613490807871
+    },
+    "annualized_emissions_tco2": {
+      "minimum": 2777.287607223392,
+      "maximum": 2964.333809794252
+    },
+    "limitations": [
+      "轻型柴油车区间来自官方相邻类别，不是车型实测值。",
+      "纯电动车电耗来自同类实车研究，不是当前车型实测值。",
+      "年化结果额外依赖活跃日可代表全年的假设。"
+    ]
+  },
   "is_complete_2023_baseline": false,
   "uncovered": [
     {

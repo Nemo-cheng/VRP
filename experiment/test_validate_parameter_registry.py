@@ -28,3 +28,14 @@ def test_unresolved_parameter_cannot_be_marked_active() -> None:
     errors = validate_registry(registry)
 
     assert any("must remain blocked" in error for error in errors)
+
+
+def test_sensitivity_parameter_cannot_be_marked_active() -> None:
+    registry = load_registry()
+    registry["sensitivity_parameters"][
+        "existing_electric_truck_energy_consumption"
+    ]["status"] = "active"
+
+    errors = validate_registry(registry)
+
+    assert any("must be sensitivity_only" in error for error in errors)

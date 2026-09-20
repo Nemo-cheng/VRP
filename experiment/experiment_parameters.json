@@ -30,6 +30,15 @@
       "publication_date": "2024-03",
       "url": "http://jtj.xiangyang.gov.cn/zw/zc/zcfg/202406/P020240604369792058729.pdf",
       "locations": ["5.1.3", "附录表1", "附录表2"]
+    },
+    "gao_bet_real_world_2025": {
+      "type": "peer_reviewed_article",
+      "title": "Estimating energy consumption rates for battery electric truck based on real-world data",
+      "authors": ["Gao Y", "Wang Y", "Sai Q"],
+      "journal": "Digital Transportation and Safety",
+      "year": 2025,
+      "doi": "10.48130/dts-0025-0020",
+      "evidence_scope": "10辆同规格82.5 kWh磷酸铁锂货车的实车数据，零载，经济车速52.02 km/h"
     }
   },
   "fixed_parameters": {
@@ -192,6 +201,23 @@
       "maximum": 40000,
       "unit": "CNY_per_vehicle_year",
       "source": "competition_brief",
+      "status": "sensitivity_only"
+    },
+    "diesel_le_2t_fuel_consumption_proxy": {
+      "minimum": 12.264943457189014,
+      "maximum": 20.2,
+      "unit": "liter_diesel_per_100km",
+      "source": "hubei_transport_carbon_guide_2024",
+      "derivation": "下界把官方2吨及以下汽油车13 L/100km按低位发热量和密度换算为等能量柴油量，上界取官方大于2吨且不超过4吨柴油车20.2 L/100km",
+      "status": "sensitivity_only"
+    }
+  },
+  "sensitivity_parameters": {
+    "existing_electric_truck_energy_consumption": {
+      "value": 0.53,
+      "unit": "kWh_per_km",
+      "source": "gao_bet_real_world_2025",
+      "applicability": "仅用于现有2吨纯电动车敏感性补全，不代表候选车型的精确电耗",
       "status": "sensitivity_only"
     }
   },

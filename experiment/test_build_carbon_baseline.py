@@ -6,8 +6,11 @@ import pytest
 from experiment.build_carbon_baseline import (
     classify_consumption_parameter,
     fuel_emission_factor_kg_per_kg,
+    interval_values,
     load_vehicle_parameters,
+    sensitivity_value,
 )
+from experiment.validate_parameter_registry import load_registry
 
 
 @pytest.mark.parametrize(
@@ -54,3 +57,14 @@ def test_vehicle_type_must_be_unique(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="车型种类必须唯一"):
         load_vehicle_parameters(path)
+
+
+def test_sensitivity_parameters_are_evidence_gated() -> None:
+    registry = load_registry()
+
+    assert interval_values(
+        registry, "diesel_le_2t_fuel_consumption_proxy"
+    ) == pytest.approx((12.264943457189014, 20.2))
+    assert sensitivity_value(
+        registry, "existing_electric_truck_energy_consumption"
+    ) == pytest.approx(0.53)

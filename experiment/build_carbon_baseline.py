@@ -48,6 +48,20 @@ def parameter_value(registry: dict[str, Any], name: str) -> float:
     return float(item["value"])
 
 
+def sensitivity_value(registry: dict[str, Any], name: str) -> float:
+    item = registry["sensitivity_parameters"][name]
+    if item.get("status") != "sensitivity_only":
+        raise ValueError(f"敏感性参数状态错误: {name}")
+    return float(item["value"])
+
+
+def interval_values(registry: dict[str, Any], name: str) -> tuple[float, float]:
+    item = registry["interval_parameters"][name]
+    if item.get("status") != "sensitivity_only":
+        raise ValueError(f"区间参数状态错误: {name}")
+    return float(item["minimum"]), float(item["maximum"])
+
+
 def fuel_emission_factor_kg_per_kg(
     lower_heating_value_gj_per_tonne: float,
     carbon_content_tonne_c_per_gj: float,
@@ -190,6 +204,48 @@ def build_baseline(
     active_service_days = int(service_dates.nunique())
     annualization_factor = 365 / active_service_days
     observed_covered_emissions = float(covered["emissions_kgco2"].sum() / 1000)
+    light_diesel = eligible[
+        eligible["coverage_status"] == "diesel_le_2t_no_official_default"
+    ]
+    existing_electric = eligible[
+        eligible["coverage_status"] == "electricity_consumption_missing"
+    ]
+    light_diesel_min, light_diesel_max = interval_values(
+        registry, "diesel_le_2t_fuel_consumption_proxy"
+    )
+    diesel_kgco2_per_liter = fuel_factors["柴油"] * densities["柴油"]
+    light_diesel_emissions_min = float(
+        light_diesel["distance_km"].sum()
+        * light_diesel_min
+        / 100
+        * diesel_kgco2_per_liter
+        / 1000
+    )
+    light_diesel_emissions_max = float(
+        light_diesel["distance_km"].sum()
+        * light_diesel_max
+        / 100
+        * diesel_kgco2_per_liter
+        / 1000
+    )
+    existing_electric_emissions = float(
+        existing_electric["distance_km"].sum()
+        * sensitivity_value(
+            registry, "existing_electric_truck_energy_consumption"
+        )
+        * parameter_value(registry, "national_grid_emission_factor_2023")
+        / 1000
+    )
+    sensitivity_total_min = (
+        observed_covered_emissions
+        + light_diesel_emissions_min
+        + existing_electric_emissions
+    )
+    sensitivity_total_max = (
+        observed_covered_emissions
+        + light_diesel_emissions_max
+        + existing_electric_emissions
+    )
     uncovered = (
         eligible[eligible["coverage_status"] != "covered"]
         .groupby("coverage_status", as_index=False)
@@ -221,6 +277,35 @@ def build_baseline(
                 observed_covered_emissions * annualization_factor
             ),
             "assumption": "观测活跃日的运输强度可代表全年，赛题未直接保证该假设。",
+        },
+        "complete_baseline_sensitivity": {
+            "status": "sensitivity_only",
+            "coverage_share": 1.0,
+            "light_diesel_proxy_l_per_100km": {
+                "minimum": light_diesel_min,
+                "maximum": light_diesel_max,
+            },
+            "light_diesel_emissions_tco2": {
+                "minimum": light_diesel_emissions_min,
+                "maximum": light_diesel_emissions_max,
+            },
+            "existing_electric_energy_kwh_per_km": sensitivity_value(
+                registry, "existing_electric_truck_energy_consumption"
+            ),
+            "existing_electric_emissions_tco2": existing_electric_emissions,
+            "observed_emissions_tco2": {
+                "minimum": sensitivity_total_min,
+                "maximum": sensitivity_total_max,
+            },
+            "annualized_emissions_tco2": {
+                "minimum": sensitivity_total_min * annualization_factor,
+                "maximum": sensitivity_total_max * annualization_factor,
+            },
+            "limitations": [
+                "轻型柴油车区间来自官方相邻类别，不是车型实测值。",
+                "纯电动车电耗来自同类实车研究，不是当前车型实测值。",
+                "年化结果额外依赖活跃日可代表全年的假设。",
+            ],
         },
         "is_complete_2023_baseline": len(covered) == len(eligible),
         "uncovered": uncovered.to_dict(orient="records"),
