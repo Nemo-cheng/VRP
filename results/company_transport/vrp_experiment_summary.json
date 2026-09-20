@@ -6,7 +6,8 @@
     "static versus time-dependent vehicle-type-compatible VRP",
     "network observation threshold sensitivity at 5, 10 and 20",
     "historical vehicle assignments versus P50 and P90 VRP on chronological holdout",
-    "vehicle-count versus internal-deadhead tradeoff on chronological holdout"
+    "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
+    "instance-level bootstrap validation of the recommended P90 solution"
   ],
   "gate_checks": {
     "all_reported_vrp_solutions_feasible": true,
@@ -16,7 +17,8 @@
     "historical_baseline_improved_by_p50_vrp": true,
     "historical_baseline_improved_by_p90_vrp": true,
     "vehicle_and_deadhead_both_improved_over_history": true,
-    "p90_vehicle_and_deadhead_both_improved_over_history": true
+    "p90_vehicle_and_deadhead_both_improved_over_history": true,
+    "recommended_p90_reduces_vehicles_in_every_instance": true
   },
   "main_findings": {
     "basic_vehicle_reduction_rate_range": [
@@ -86,13 +88,28 @@
     "historical_p90_chain_deadhead_distance_km": 3463.1500000000005,
     "best_p90_no_more_deadhead_scenario": {
       "scenario": "vehicle_cost_89_km",
+      "vehicle_cost_equivalent_km": 89.0,
       "vehicle_count": 861,
       "vehicle_reduction": 152,
       "vehicle_reduction_rate": 0.15004935834155972,
       "internal_deadhead_distance_km": 3455.44,
       "deadhead_reduction_km": 7.710000000000491
     },
-    "all_p90_tradeoff_scenarios_feasible": true
+    "all_p90_tradeoff_scenarios_feasible": true,
+    "recommended_p90_instance_validation": {
+      "instances_with_vehicle_reduction": 34,
+      "instances_with_vehicle_increase": 0,
+      "instances_with_no_deadhead_increase": 11,
+      "instances_with_deadhead_increase": 23,
+      "aggregate_vehicle_reduction_rate_95_ci": [
+        0.12677201658659212,
+        0.17941968287232835
+      ],
+      "aggregate_deadhead_reduction_km_95_ci": [
+        -1125.9494999999997,
+        1250.51
+      ]
+    }
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."
 }

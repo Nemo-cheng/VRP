@@ -138,6 +138,17 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "all_scenarios_feasible": True,
         },
     )
+    write_json(
+        holdout / "recommended_p90_validation_summary.json",
+        {
+            "instances_with_vehicle_reduction": 20,
+            "instances_with_vehicle_increase": 0,
+            "instances_with_no_deadhead_increase": 8,
+            "instances_with_deadhead_increase": 12,
+            "aggregate_vehicle_reduction_rate_95_ci": [0.12, 0.20],
+            "aggregate_deadhead_reduction_km_95_ci": [-20.0, 25.0],
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -157,6 +168,13 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
         == 80
     )
     assert report["gate_checks"]["p90_vehicle_and_deadhead_both_improved_over_history"]
+    assert report["gate_checks"]["recommended_p90_reduces_vehicles_in_every_instance"]
+    assert (
+        report["chronological_holdout"]["recommended_p90_instance_validation"][
+            "instances_with_deadhead_increase"
+        ]
+        == 12
+    )
     assert (
         report["chronological_holdout"]["best_p90_no_more_deadhead_scenario"][
             "vehicle_count"

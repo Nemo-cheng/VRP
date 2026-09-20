@@ -85,6 +85,9 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
     robust_tradeoff = read_json(
         directory / "robust_p90_vehicle_deadhead_tradeoff_summary.json"
     )
+    recommended_validation = read_json(
+        directory / "recommended_p90_validation_summary.json"
+    )
     return {
         "protocol": readiness["validation_protocol"],
         "qualified_instances": readiness["instances"]["qualified_instances"],
@@ -132,6 +135,26 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
         "all_p90_tradeoff_scenarios_feasible": robust_tradeoff[
             "all_scenarios_feasible"
         ],
+        "recommended_p90_instance_validation": {
+            "instances_with_vehicle_reduction": recommended_validation[
+                "instances_with_vehicle_reduction"
+            ],
+            "instances_with_vehicle_increase": recommended_validation[
+                "instances_with_vehicle_increase"
+            ],
+            "instances_with_no_deadhead_increase": recommended_validation[
+                "instances_with_no_deadhead_increase"
+            ],
+            "instances_with_deadhead_increase": recommended_validation[
+                "instances_with_deadhead_increase"
+            ],
+            "aggregate_vehicle_reduction_rate_95_ci": recommended_validation[
+                "aggregate_vehicle_reduction_rate_95_ci"
+            ],
+            "aggregate_deadhead_reduction_km_95_ci": recommended_validation[
+                "aggregate_deadhead_reduction_km_95_ci"
+            ],
+        },
     }
 
 
@@ -179,6 +202,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "network observation threshold sensitivity at 5, 10 and 20",
             "historical vehicle assignments versus P50 and P90 VRP on chronological holdout",
             "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
+            "instance-level bootstrap validation of the recommended P90 solution",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
@@ -206,6 +230,16 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
                 ]
                 > 0
                 and holdout["all_p90_tradeoff_scenarios_feasible"]
+            ),
+            "recommended_p90_reduces_vehicles_in_every_instance": (
+                holdout["recommended_p90_instance_validation"][
+                    "instances_with_vehicle_reduction"
+                ]
+                == holdout["qualified_instances"]
+                and holdout["recommended_p90_instance_validation"][
+                    "instances_with_vehicle_increase"
+                ]
+                == 0
             ),
         },
         "main_findings": {
