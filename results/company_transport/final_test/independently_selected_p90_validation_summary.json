@@ -1,6 +1,6 @@
 {
   "source_only": "订单数据.xlsx",
-  "solution": "p90_vehicle_cost_75_km_selected_on_2023_11",
+  "solution": "P90 historical deadhead controlled solution",
   "instances": 23,
   "tasks": 731,
   "historical_vehicle_chain_count": 692,
@@ -28,5 +28,5 @@
     1910.5482499999998
   ],
   "inference_scope": "Intervals describe variation across the 23 evaluation instances. Parameter selection used an earlier period, so this is an independent final-test estimate.",
-  "result_interpretation": "Vehicle reduction is consistent across instances. Aggregate deadhead is approximately unchanged, while instance-level deadhead changes are heterogeneous."
+  "result_interpretation": "Vehicle reduction is consistent across resampled instances. The deadhead change interval crosses zero, so its aggregate direction is uncertain across instances."
 }

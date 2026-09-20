@@ -80,3 +80,25 @@ def test_bootstrap_is_reproducible() -> None:
     second = bootstrap_intervals(comparison, samples=100, seed=11)
 
     assert first == second
+
+
+def test_summary_interprets_consistent_deadhead_increase() -> None:
+    comparison = pd.DataFrame(
+        {
+            "task_count": [10, 10],
+            "historical_vehicle_chain_count": [5, 5],
+            "recommended_vehicle_count": [4, 4],
+            "historical_deadhead_distance_km": [10.0, 20.0],
+            "recommended_deadhead_distance_km": [30.0, 40.0],
+            "vehicle_reduction": [1, 1],
+            "vehicle_reduction_rate": [0.2, 0.2],
+            "deadhead_reduction_km": [-20.0, -20.0],
+            "vehicle_improved": [True, True],
+            "deadhead_not_increased": [False, False],
+            "both_improved_or_equal": [False, False],
+        }
+    )
+
+    summary = summarize_validation(comparison, samples=100, seed=7)
+
+    assert "Deadhead increase is consistent" in summary["result_interpretation"]

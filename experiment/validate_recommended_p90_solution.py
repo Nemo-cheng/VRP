@@ -152,6 +152,26 @@ def summarize_validation(
     historical_deadhead = float(comparison["historical_deadhead_distance_km"].sum())
     recommended_deadhead = float(comparison["recommended_deadhead_distance_km"].sum())
     intervals = bootstrap_intervals(comparison, samples, seed)
+    vehicle_ci = intervals["aggregate_vehicle_reduction_rate_95_ci"]
+    deadhead_ci = intervals["aggregate_deadhead_reduction_km_95_ci"]
+    vehicle_interpretation = (
+        "Vehicle reduction is consistent across resampled instances."
+        if vehicle_ci[0] > 0
+        else "Vehicle reduction is not consistently above zero across resampled instances."
+    )
+    if deadhead_ci[0] > 0:
+        deadhead_interpretation = (
+            "Deadhead reduction is consistent across resampled instances."
+        )
+    elif deadhead_ci[1] < 0:
+        deadhead_interpretation = (
+            "Deadhead increase is consistent across resampled instances."
+        )
+    else:
+        deadhead_interpretation = (
+            "The deadhead change interval crosses zero, so its aggregate direction "
+            "is uncertain across instances."
+        )
     return {
         "source_only": "订单数据.xlsx",
         "solution": solution_label,
@@ -198,11 +218,7 @@ def summarize_validation(
                 "holdout and is not an independent confirmatory estimate."
             )
         ),
-        "result_interpretation": (
-            "Vehicle reduction is consistent across instances. Aggregate "
-            "deadhead is approximately unchanged, while instance-level "
-            "deadhead changes are heterogeneous."
-        ),
+        "result_interpretation": f"{vehicle_interpretation} {deadhead_interpretation}",
     }
 
 

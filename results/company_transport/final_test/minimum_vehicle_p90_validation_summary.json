@@ -1,0 +1,32 @@
+{
+  "source_only": "订单数据.xlsx",
+  "solution": "P90 minimum vehicle solution",
+  "instances": 23,
+  "tasks": 731,
+  "historical_vehicle_chain_count": 692,
+  "recommended_vehicle_count": 565,
+  "aggregate_vehicle_reduction": 127,
+  "aggregate_vehicle_reduction_rate": 0.18352601156069365,
+  "historical_deadhead_distance_km": 2345.8500000000004,
+  "recommended_deadhead_distance_km": 6308.540000000001,
+  "aggregate_deadhead_reduction_km": -3962.6900000000005,
+  "instances_with_vehicle_reduction": 23,
+  "instances_with_equal_vehicle_count": 0,
+  "instances_with_vehicle_increase": 0,
+  "instances_with_no_deadhead_increase": 4,
+  "instances_with_deadhead_increase": 19,
+  "instances_with_both_vehicle_and_deadhead_improvement": 4,
+  "median_instance_vehicle_reduction_rate": 0.21428571428571427,
+  "bootstrap_samples": 10000,
+  "bootstrap_random_seed": 20260920,
+  "aggregate_vehicle_reduction_rate_95_ci": [
+    0.15237016703132814,
+    0.23034846936946624
+  ],
+  "aggregate_deadhead_reduction_km_95_ci": [
+    -6720.070250000001,
+    -1678.5465000000013
+  ],
+  "inference_scope": "Intervals describe variation across the 23 evaluation instances. Parameter selection used an earlier period, so this is an independent final-test estimate.",
+  "result_interpretation": "Vehicle reduction is consistent across resampled instances. Deadhead increase is consistent across resampled instances."
+}
