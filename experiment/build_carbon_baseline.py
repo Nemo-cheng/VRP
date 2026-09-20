@@ -236,6 +236,35 @@ def build_baseline(
         * parameter_value(registry, "national_grid_emission_factor_2023")
         / 1000
     )
+    eligible["emissions_kgco2_min"] = eligible["emissions_kgco2"]
+    eligible["emissions_kgco2_max"] = eligible["emissions_kgco2"]
+    light_diesel_mask = (
+        eligible["coverage_status"] == "diesel_le_2t_no_official_default"
+    )
+    eligible.loc[light_diesel_mask, "emissions_kgco2_min"] = (
+        eligible.loc[light_diesel_mask, "distance_km"]
+        * light_diesel_min
+        / 100
+        * diesel_kgco2_per_liter
+    )
+    eligible.loc[light_diesel_mask, "emissions_kgco2_max"] = (
+        eligible.loc[light_diesel_mask, "distance_km"]
+        * light_diesel_max
+        / 100
+        * diesel_kgco2_per_liter
+    )
+    electric_mask = (
+        eligible["coverage_status"] == "electricity_consumption_missing"
+    )
+    electric_factor = sensitivity_value(
+        registry, "existing_electric_truck_energy_consumption"
+    ) * parameter_value(registry, "national_grid_emission_factor_2023")
+    eligible.loc[electric_mask, "emissions_kgco2_min"] = (
+        eligible.loc[electric_mask, "distance_km"] * electric_factor
+    )
+    eligible.loc[electric_mask, "emissions_kgco2_max"] = (
+        eligible.loc[electric_mask, "distance_km"] * electric_factor
+    )
     sensitivity_total_min = (
         observed_covered_emissions
         + light_diesel_emissions_min

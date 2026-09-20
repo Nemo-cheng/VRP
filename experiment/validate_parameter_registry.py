@@ -47,6 +47,13 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         if item.get("status") != "sensitivity_only":
             errors.append(f"{name}: sensitivity parameter must be sensitivity_only")
 
+    for name, item in registry.get("method_parameters", {}).items():
+        require_source(name, item)
+        if item.get("value") is None:
+            errors.append(f"{name}: method value is required")
+        if item.get("status") != "active":
+            errors.append(f"{name}: method parameter must be active")
+
     for index, vehicle in enumerate(registry.get("candidate_vehicles", [])):
         name = f"candidate_vehicles[{index}]"
         require_source(name, vehicle)

@@ -1,0 +1,24 @@
+{
+  "allocation_standard": "ISO 14083:2023",
+  "allocation_method": "weight_share",
+  "fallback_method": "equal_share_when_total_positive_weight_is_zero",
+  "eligible_physical_legs": 10975,
+  "allocated_leg_waybill_relations": 30192,
+  "allocated_waybills": 12033,
+  "source_waybills": 12098,
+  "excluded_waybills": 65,
+  "lanes": 3061,
+  "equal_share_relations": 0,
+  "leg_emissions_kgco2": {
+    "minimum": 943516.8857416455,
+    "maximum": 1007061.349080787
+  },
+  "allocated_emissions_kgco2": {
+    "minimum": 943516.8857416455,
+    "maximum": 1007061.349080787
+  },
+  "reconciliation_error_kgco2": {
+    "minimum": 0.0,
+    "maximum": 0.0
+  }
+}
