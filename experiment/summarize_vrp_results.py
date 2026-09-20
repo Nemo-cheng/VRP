@@ -172,6 +172,9 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
     final_validation = read_json(
         result_dir / "final_test" / "independently_selected_p90_validation_summary.json"
     )
+    greedy_comparison = read_json(
+        result_dir / "final_test" / "greedy_vs_vrp_summary.json"
+    )
     selected = validation_choice["best_scenario_with_no_more_deadhead_than_history"]
     return {
         "validation_period": validation_readiness["validation_protocol"],
@@ -205,6 +208,7 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
                 "aggregate_deadhead_reduction_km_95_ci"
             ],
         },
+        "greedy_dispatch_comparison": greedy_comparison,
     }
 
 
@@ -255,6 +259,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
             "instance-level bootstrap validation of the recommended P90 solution",
             "November parameter selection followed by frozen December final testing",
+            "chronological greedy dispatch versus global P90 VRP on the independent final test",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
@@ -304,6 +309,20 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
                 "instance_validation"
             ]["instances_with_vehicle_increase"]
             == 0,
+            "minimum_vehicle_p90_vrp_dominates_greedy": (
+                independent["greedy_dispatch_comparison"][
+                    "minimum_vehicle_p90_vrp_vehicle_reduction_vs_greedy"
+                ]
+                > 0
+                and independent["greedy_dispatch_comparison"][
+                    "minimum_vehicle_p90_vrp_deadhead_reduction_vs_greedy_km"
+                ]
+                > 0
+            ),
+            "frozen_weighted_p90_vrp_improves_proxy_cost": independent[
+                "greedy_dispatch_comparison"
+            ]["vrp_weighted_proxy_cost_reduction_rate"]
+            > 0,
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [
