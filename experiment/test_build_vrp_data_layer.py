@@ -5,6 +5,7 @@ from build_vrp_data_layer import (
     build_instances,
     build_lane_vehicle_types,
     build_network_tables,
+    build_readiness_report,
     build_tasks,
 )
 
@@ -82,3 +83,20 @@ def test_empty_instance_result_keeps_output_schema() -> None:
     assert links.empty
     assert "qualifies_for_vrp" in instances.columns
     assert "deadhead_distance_km" in links.columns
+
+    edges, periods = build_network_tables(tasks, 1, 1)
+    report = build_readiness_report(
+        tasks,
+        edges,
+        periods,
+        instances,
+        links,
+        min_edge_observations=1,
+        min_period_observations=1,
+        min_instance_tasks=2,
+        required_instances=1,
+    )
+
+    assert report["instances"]["qualified_instances"] == 0
+    assert report["instances"]["qualified_tasks"] == 0
+    assert not report["ready_for_basic_vrp_comparison"]

@@ -278,7 +278,7 @@ def build_readiness_report(
     min_instance_tasks: int,
     required_instances: int,
 ) -> dict[str, object]:
-    qualified = instances[instances["qualifies_for_vrp"]]
+    qualified = instances[instances["qualifies_for_vrp"].eq(True)]
     required_columns = [
         "origin_site_id",
         "destination_site_id",
