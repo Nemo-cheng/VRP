@@ -18,7 +18,8 @@ from typing import Any
 
 import pandas as pd
 
-from experiment.audit_route_operating_window import CHAIN_KEY, audit_schedule
+from experiment.audit_retimed_operating_window import audit_retimed_schedule
+from experiment.audit_route_operating_window import CHAIN_KEY
 from experiment.prepare_excel_transport_data import build_transport_events, load_data
 from experiment.validate_parameter_registry import load_registry
 
@@ -91,7 +92,7 @@ def build_chain_requirements(
     )
     if frame["total_weight_kg"].isna().any():
         raise ValueError("存在无法关联载重的路线任务")
-    audit, audit_summary = audit_schedule(frame)
+    audit, audit_summary = audit_retimed_schedule(frame)
     requirements = (
         frame.groupby(CHAIN_KEY, as_index=False)
         .agg(
@@ -104,13 +105,19 @@ def build_chain_requirements(
             audit[
                 [
                     *CHAIN_KEY,
-                    "chain_elapsed_hours",
-                    "operating_window_compliant",
+                    "retimed_shift_hours",
+                    "retimed_operating_window_compliant",
                 ]
             ],
             on=CHAIN_KEY,
             validate="one_to_one",
         )
+    )
+    requirements = requirements.rename(
+        columns={
+            "retimed_shift_hours": "chain_operating_hours",
+            "retimed_operating_window_compliant": "operating_window_compliant",
+        }
     )
     requirements["required_distance_km"] = (
         requirements["loaded_distance_km"]
@@ -148,7 +155,7 @@ def evaluate_candidates(
                         "effective_winter_2026_range_km": effective_range,
                         "maximum_task_payload_kg": chain.maximum_task_payload_kg,
                         "required_distance_km": chain.required_distance_km,
-                        "chain_elapsed_hours": chain.chain_elapsed_hours,
+                        "chain_operating_hours": chain.chain_operating_hours,
                         "operating_window_feasible": window_feasible,
                         "payload_feasible": payload_feasible,
                         "range_feasible_without_recharging": range_feasible,
@@ -198,13 +205,14 @@ def main() -> None:
         "source_only": ["订单数据.xlsx", "车辆数据.xlsx", "competition_brief"],
         "route_solution": "independently_selected_p90_solution",
         "chains": len(requirements),
-        "window_compliant_chains": int(
+        "retimed_window_compliant_chains": int(
             requirements["operating_window_compliant"].sum()
         ),
         "scenarios": {
             "lower_bound": "候选车型载重和标称续航区间下界",
             "upper_bound": "候选车型载重和标称续航区间上界",
         },
+        "operating_window_method": "retimed_14_hour_shift",
         "winter_and_degradation_applied": True,
         "en_route_recharging_assumed": False,
         "operating_window_audit": audit_summary,

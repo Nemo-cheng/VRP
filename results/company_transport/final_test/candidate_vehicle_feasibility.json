@@ -6,28 +6,29 @@
   ],
   "route_solution": "independently_selected_p90_solution",
   "chains": 594,
-  "window_compliant_chains": 144,
+  "retimed_window_compliant_chains": 552,
   "scenarios": {
     "lower_bound": "候选车型载重和标称续航区间下界",
     "upper_bound": "候选车型载重和标称续航区间上界"
   },
+  "operating_window_method": "retimed_14_hour_shift",
   "winter_and_degradation_applied": true,
   "en_route_recharging_assumed": false,
   "operating_window_audit": {
     "schedule": "independently_selected_p90_solution",
     "constraint_source": "competition_brief",
-    "clock_window": "06:00-20:00",
     "maximum_daily_operating_hours": 14.0,
-    "tasks": 731,
-    "tasks_outside_clock_window": 530,
-    "tasks_outside_clock_window_rate": 0.7250341997264022,
-    "tasks_over_14h": 39,
+    "retiming_rule": "保留任务顺序、实际载货行驶时长和P90空驶时长，不把历史等待时间视为客户时间窗。",
+    "customer_time_windows_available": false,
     "vehicle_chains": 594,
-    "chains_over_14h": 111,
-    "chains_with_out_of_window_task": 450,
-    "operating_window_compliant_chains": 144,
-    "operating_window_compliant_chain_rate": 0.24242424242424243,
-    "decision": "Only compliant chains may enter vehicle replacement feasibility. Noncompliant tasks require a separate rescheduling model because the dataset has no customer service time windows."
+    "retimed_compliant_chains": 552,
+    "retimed_compliant_chain_rate": 0.9292929292929293,
+    "tasks": 731,
+    "tasks_on_retimed_compliant_chains": 683,
+    "tasks_on_retimed_noncompliant_chains": 48,
+    "individual_tasks_over_14h": 39,
+    "chains_over_14h_after_retiming": 42,
+    "decision": "重排后合规链可进入车辆替换可行性实验。超长任务需要中继拆分、多日运输或保留其他运营方案，订单数据不足以自动选择处理方式。"
   },
   "decision_scope": "结果只验证载重、无途中补能续航和运营窗口，不包含碳排放与成本排序。"
 }
