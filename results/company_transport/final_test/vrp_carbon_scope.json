@@ -1,0 +1,23 @@
+{
+  "carbon_baseline_eligible_legs": 10975,
+  "vrp_final_test_tasks": 731,
+  "task_scope_share": 0.06660592255125285,
+  "carbon_baseline_distance_km": 1347434.1300000001,
+  "vrp_final_test_loaded_distance_km": 103114.34,
+  "distance_scope_share": 0.07652644214971754,
+  "carbon_baseline_emissions_kgco2": {
+    "minimum": 943516.8857416455,
+    "maximum": 1007061.349080787
+  },
+  "vrp_final_test_loaded_emissions_kgco2": {
+    "minimum": 72597.02081925061,
+    "maximum": 77229.5739312249
+  },
+  "emission_scope_share": {
+    "minimum_case": 0.07694300114426271,
+    "maximum_case": 0.0766880528199375
+  },
+  "scope_period": "2023-12 independent final test versus all observed months",
+  "extrapolation_allowed": false,
+  "reason": "最终测试只包含12月网络连通且实例规模达标的任务，不是从全部有效运输段随机抽样。"
+}
