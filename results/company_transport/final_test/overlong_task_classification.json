@@ -1,0 +1,19 @@
+{
+  "schedule": "independently_selected_p90_solution",
+  "classification_evidence": "training_period_lane_statistics_only",
+  "test_period_used_for_threshold_estimation": false,
+  "maximum_daily_operating_hours": 14.0,
+  "maximum_hours_source": "competition_brief",
+  "overlong_tasks": 39,
+  "verified_multiday_long_haul_tasks": 33,
+  "verified_multiday_long_haul_distance_km": 42745.2,
+  "deferred_time_anomaly_tasks": 6,
+  "deferred_time_anomaly_distance_km": 452.69,
+  "multiday_operating_days_distribution": {
+    "2": 32,
+    "3": 1
+  },
+  "spatial_relay_nodes_created": false,
+  "overnight_energy_replenishment_verified": false,
+  "decision": "训练期高置信线路P90超过14小时的任务进入跨日运营分析。其余超时任务作为时间异常暂缓，不采用原始时长，也不进入本轮结果。"
+}
