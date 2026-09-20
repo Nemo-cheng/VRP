@@ -158,6 +158,56 @@ def summarize_holdout(directory: Path) -> dict[str, object]:
     }
 
 
+def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
+    validation_readiness = read_json(
+        result_dir / "validation" / "vrp_data_readiness.json"
+    )
+    validation_choice = read_json(
+        result_dir / "validation" / "robust_p90_vehicle_deadhead_tradeoff_summary.json"
+    )
+    final_readiness = read_json(result_dir / "final_test" / "vrp_data_readiness.json")
+    final_solution = read_json(
+        result_dir / "final_test" / "independently_selected_p90_solution_summary.json"
+    )
+    final_validation = read_json(
+        result_dir / "final_test" / "independently_selected_p90_validation_summary.json"
+    )
+    selected = validation_choice["best_scenario_with_no_more_deadhead_than_history"]
+    return {
+        "validation_period": validation_readiness["validation_protocol"],
+        "validation_instances": validation_readiness["instances"][
+            "qualified_instances"
+        ],
+        "validation_instance_gate_met": validation_readiness["gate_checks"][
+            "enough_independent_instances"
+        ],
+        "selected_vehicle_cost_equivalent_km": selected["vehicle_cost_equivalent_km"],
+        "final_test_period": final_readiness["validation_protocol"],
+        "final_test_instances": final_readiness["instances"]["qualified_instances"],
+        "final_test_instance_gate_met": final_readiness["gate_checks"][
+            "enough_independent_instances"
+        ],
+        "final_solution": final_solution,
+        "instance_validation": {
+            "instances_with_vehicle_reduction": final_validation[
+                "instances_with_vehicle_reduction"
+            ],
+            "instances_with_equal_vehicle_count": final_validation[
+                "instances_with_equal_vehicle_count"
+            ],
+            "instances_with_vehicle_increase": final_validation[
+                "instances_with_vehicle_increase"
+            ],
+            "aggregate_vehicle_reduction_rate_95_ci": final_validation[
+                "aggregate_vehicle_reduction_rate_95_ci"
+            ],
+            "aggregate_deadhead_reduction_km_95_ci": final_validation[
+                "aggregate_deadhead_reduction_km_95_ci"
+            ],
+        },
+    }
+
+
 def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
     directories = {
         5: result_dir / "sensitivity" / "edge5",
@@ -183,6 +233,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
         (table["alternative_path_task_share"] >= 0.05).all()
     )
     holdout = summarize_holdout(result_dir / "holdout")
+    independent = summarize_independent_validation(result_dir)
     holdout_feasible = bool(
         holdout["task_service_rate"] == 1.0
         and holdout["route_type_violations"] == 0
@@ -203,6 +254,7 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "historical vehicle assignments versus P50 and P90 VRP on chronological holdout",
             "vehicle-count versus internal-deadhead tradeoff on chronological holdout",
             "instance-level bootstrap validation of the recommended P90 solution",
+            "November parameter selection followed by frozen December final testing",
         ],
         "gate_checks": {
             "all_reported_vrp_solutions_feasible": all_feasible,
@@ -241,6 +293,17 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
                 ]
                 == 0
             ),
+            "independent_final_test_instance_gate_met": independent[
+                "final_test_instance_gate_met"
+            ],
+            "independent_final_test_vehicle_ci_above_zero": independent[
+                "instance_validation"
+            ]["aggregate_vehicle_reduction_rate_95_ci"][0]
+            > 0,
+            "independent_final_test_has_no_vehicle_increase": independent[
+                "instance_validation"
+            ]["instances_with_vehicle_increase"]
+            == 0,
         },
         "main_findings": {
             "basic_vehicle_reduction_rate_range": [
@@ -273,8 +336,23 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "loaded_path_choice_role": "supplementary analysis"
             if not path_selection_supported
             else "main experiment",
+            "final_solution": {
+                "travel_time_stat": "p90",
+                "vehicle_cost_equivalent_km": independent[
+                    "selected_vehicle_cost_equivalent_km"
+                ],
+                "selection_period": "2023-11",
+                "final_test_period": "2023-12",
+                "vehicle_count": independent["final_solution"][
+                    "recommended_vehicle_count"
+                ],
+                "vehicle_reduction_rate": independent["final_solution"][
+                    "vehicle_reduction_rate"
+                ],
+            },
         },
         "chronological_holdout": holdout,
+        "independent_parameter_validation": independent,
         "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet.",
     }
     return table, report

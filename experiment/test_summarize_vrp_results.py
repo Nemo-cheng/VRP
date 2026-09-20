@@ -149,6 +149,48 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "aggregate_deadhead_reduction_km_95_ci": [-20.0, 25.0],
         },
     )
+    validation = tmp_path / "validation"
+    validation.mkdir()
+    write_json(
+        validation / "vrp_data_readiness.json",
+        {
+            "validation_protocol": {"test_period_start_inclusive": "2023-11-01"},
+            "instances": {"qualified_instances": 11},
+            "gate_checks": {"enough_independent_instances": False},
+        },
+    )
+    write_json(
+        validation / "robust_p90_vehicle_deadhead_tradeoff_summary.json",
+        {
+            "best_scenario_with_no_more_deadhead_than_history": {
+                "vehicle_cost_equivalent_km": 75.0
+            }
+        },
+    )
+    final_test = tmp_path / "final_test"
+    final_test.mkdir()
+    write_json(
+        final_test / "vrp_data_readiness.json",
+        {
+            "validation_protocol": {"test_period_start_inclusive": "2023-12-01"},
+            "instances": {"qualified_instances": 23},
+            "gate_checks": {"enough_independent_instances": True},
+        },
+    )
+    write_json(
+        final_test / "independently_selected_p90_solution_summary.json",
+        {"recommended_vehicle_count": 59, "vehicle_reduction_rate": 0.14},
+    )
+    write_json(
+        final_test / "independently_selected_p90_validation_summary.json",
+        {
+            "instances_with_vehicle_reduction": 22,
+            "instances_with_equal_vehicle_count": 1,
+            "instances_with_vehicle_increase": 0,
+            "aggregate_vehicle_reduction_rate_95_ci": [0.10, 0.18],
+            "aggregate_deadhead_reduction_km_95_ci": [-5.0, 20.0],
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -181,3 +223,11 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
         ]
         == 82
     )
+    assert report["decision"]["final_solution"]["vehicle_cost_equivalent_km"] == 75.0
+    assert report["decision"]["final_solution"]["vehicle_count"] == 59
+    assert report["gate_checks"]["independent_final_test_instance_gate_met"]
+    assert report["gate_checks"]["independent_final_test_vehicle_ci_above_zero"]
+    assert report["gate_checks"]["independent_final_test_has_no_vehicle_increase"]
+    assert not report["independent_parameter_validation"][
+        "validation_instance_gate_met"
+    ]
