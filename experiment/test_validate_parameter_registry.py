@@ -21,7 +21,7 @@ def test_active_parameter_without_source_is_rejected(tmp_path: Path) -> None:
 
 def test_unresolved_parameter_cannot_be_marked_active() -> None:
     registry = load_registry()
-    registry["blocked_parameters"]["existing_vehicle_emission_factors"][
+    registry["blocked_parameters"]["existing_vehicle_emission_factors_uncovered"][
         "status"
     ] = "active"
 

@@ -1,0 +1,25 @@
+{
+  "source_period": "2023-01-01/2023-12-31",
+  "annualization_applied": false,
+  "method_source": "hubei_transport_carbon_guide_2024",
+  "eligible_physical_legs": 10975,
+  "eligible_distance_km": 1347434.1300000001,
+  "covered_physical_legs": 4329,
+  "covered_distance_km": 1028713.1299999999,
+  "covered_distance_share": 0.7634607934415316,
+  "covered_emissions_tco2": 845.1724831329165,
+  "is_complete_2023_baseline": false,
+  "uncovered": [
+    {
+      "coverage_status": "diesel_le_2t_no_official_default",
+      "physical_legs": 6634,
+      "distance_km": 318273.25
+    },
+    {
+      "coverage_status": "electricity_consumption_missing",
+      "physical_legs": 12,
+      "distance_km": 447.75
+    }
+  ],
+  "interpretation": "covered_emissions_tco2仅表示官方缺省参数覆盖的运输段，不能作为完整2023年总排放。"
+}
