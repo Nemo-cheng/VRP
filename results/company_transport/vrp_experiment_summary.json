@@ -48,14 +48,29 @@
     "proceed_with_vrp_comparison": true,
     "use_loaded_path_choice_as_main_experiment": false,
     "loaded_path_choice_role": "supplementary analysis",
-    "final_solution": {
-      "travel_time_stat": "p90",
-      "vehicle_cost_equivalent_km": 75.0,
-      "selection_period": "2023-11",
-      "final_test_period": "2023-12",
-      "vehicle_count": 594,
-      "vehicle_reduction_rate": 0.1416184971098266
-    }
+    "solution_selection": "both_retained_no_economic_ranking",
+    "retained_solutions": [
+      {
+        "solution": "minimum_vehicle_p90",
+        "decision_role": "vehicle compression bound",
+        "vehicle_count": 565,
+        "internal_deadhead_distance_km": 6308.54,
+        "vehicle_reduction_vs_history": 127,
+        "deadhead_reduction_vs_history_km": -3962.69,
+        "task_service_rate": 1.0,
+        "constraint_violations": 0
+      },
+      {
+        "solution": "historical_deadhead_controlled_p90",
+        "decision_role": "historical deadhead controlled compromise",
+        "vehicle_count": 594,
+        "internal_deadhead_distance_km": 1850.9999999999998,
+        "vehicle_reduction_vs_history": 98,
+        "deadhead_reduction_vs_history_km": 494.85000000000014,
+        "task_service_rate": 1.0,
+        "constraint_violations": 0
+      }
+    ]
   },
   "chronological_holdout": {
     "protocol": {
@@ -152,7 +167,7 @@
     },
     "final_test_instances": 23,
     "final_test_instance_gate_met": true,
-    "final_solution": {
+    "historical_deadhead_controlled_solution": {
       "source_only": "订单数据.xlsx",
       "protocol": "Frozen parameter selected before final-test evaluation.",
       "travel_time_stat": "p90",
@@ -217,6 +232,40 @@
       ],
       "greedy_constraint_violations": 0,
       "vrp_constraint_violations": 0
+    },
+    "retained_solutions": {
+      "source_only": "订单数据.xlsx",
+      "travel_time_stat": "p90",
+      "instances": 23,
+      "tasks": 731,
+      "historical_p90_chain_vehicle_count": 692,
+      "historical_p90_chain_deadhead_distance_km": 2345.85,
+      "retained_solutions": [
+        {
+          "solution": "minimum_vehicle_p90",
+          "decision_role": "vehicle compression bound",
+          "vehicle_count": 565,
+          "internal_deadhead_distance_km": 6308.54,
+          "vehicle_reduction_vs_history": 127,
+          "deadhead_reduction_vs_history_km": -3962.69,
+          "task_service_rate": 1.0,
+          "constraint_violations": 0
+        },
+        {
+          "solution": "historical_deadhead_controlled_p90",
+          "decision_role": "historical deadhead controlled compromise",
+          "vehicle_count": 594,
+          "internal_deadhead_distance_km": 1850.9999999999998,
+          "vehicle_reduction_vs_history": 98,
+          "deadhead_reduction_vs_history_km": 494.85000000000014,
+          "task_service_rate": 1.0,
+          "constraint_violations": 0
+        }
+      ],
+      "selection_status": "both_retained_no_economic_ranking",
+      "reason": "The order data contain no observed vehicle fixed cost or per-kilometre operating cost, so they cannot identify a unique economic optimum.",
+      "vehicle_cost_equivalent_km_role": "The frozen 75 km value identifies the independently selected compromise and is not an observed monetary cost.",
+      "all_retained_solutions_feasible": true
     }
   },
   "scope_note": "Vehicle counts and reductions apply to the observed task sample, not the company's complete fleet."

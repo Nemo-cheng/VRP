@@ -201,6 +201,19 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
             "minimum_vehicle_p90_vrp_deadhead_reduction_vs_greedy_km": 120.0,
         },
     )
+    write_json(
+        final_test / "retained_p90_solutions.json",
+        {
+            "selection_status": "both_retained_no_economic_ranking",
+            "retained_solutions": [
+                {"solution": "minimum_vehicle_p90", "vehicle_count": 55},
+                {
+                    "solution": "historical_deadhead_controlled_p90",
+                    "vehicle_count": 59,
+                },
+            ],
+        },
+    )
 
     table, report = build_summary(tmp_path)
 
@@ -233,8 +246,10 @@ def test_summary_applies_feasibility_and_path_coverage_gates(tmp_path: Path) -> 
         ]
         == 82
     )
-    assert report["decision"]["final_solution"]["vehicle_cost_equivalent_km"] == 75.0
-    assert report["decision"]["final_solution"]["vehicle_count"] == 59
+    assert report["decision"]["solution_selection"] == (
+        "both_retained_no_economic_ranking"
+    )
+    assert len(report["decision"]["retained_solutions"]) == 2
     assert report["gate_checks"]["independent_final_test_instance_gate_met"]
     assert report["gate_checks"]["independent_final_test_vehicle_ci_above_zero"]
     assert report["gate_checks"]["independent_final_test_has_no_vehicle_increase"]

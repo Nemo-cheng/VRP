@@ -175,6 +175,9 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
     greedy_comparison = read_json(
         result_dir / "final_test" / "greedy_vs_vrp_summary.json"
     )
+    retained_solutions = read_json(
+        result_dir / "final_test" / "retained_p90_solutions.json"
+    )
     selected = validation_choice["best_scenario_with_no_more_deadhead_than_history"]
     return {
         "validation_period": validation_readiness["validation_protocol"],
@@ -190,7 +193,7 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
         "final_test_instance_gate_met": final_readiness["gate_checks"][
             "enough_independent_instances"
         ],
-        "final_solution": final_solution,
+        "historical_deadhead_controlled_solution": final_solution,
         "instance_validation": {
             "instances_with_vehicle_reduction": final_validation[
                 "instances_with_vehicle_reduction"
@@ -209,6 +212,7 @@ def summarize_independent_validation(result_dir: Path) -> dict[str, object]:
             ],
         },
         "greedy_dispatch_comparison": greedy_comparison,
+        "retained_solutions": retained_solutions,
     }
 
 
@@ -355,20 +359,10 @@ def build_summary(result_dir: Path) -> tuple[pd.DataFrame, dict[str, object]]:
             "loaded_path_choice_role": "supplementary analysis"
             if not path_selection_supported
             else "main experiment",
-            "final_solution": {
-                "travel_time_stat": "p90",
-                "vehicle_cost_equivalent_km": independent[
-                    "selected_vehicle_cost_equivalent_km"
-                ],
-                "selection_period": "2023-11",
-                "final_test_period": "2023-12",
-                "vehicle_count": independent["final_solution"][
-                    "recommended_vehicle_count"
-                ],
-                "vehicle_reduction_rate": independent["final_solution"][
-                    "vehicle_reduction_rate"
-                ],
-            },
+            "solution_selection": "both_retained_no_economic_ranking",
+            "retained_solutions": independent["retained_solutions"][
+                "retained_solutions"
+            ],
         },
         "chronological_holdout": holdout,
         "independent_parameter_validation": independent,
