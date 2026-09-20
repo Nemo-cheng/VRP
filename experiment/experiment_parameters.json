@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "competition_brief": {
+      "type": "competition_document",
+      "title": "命题2 基于成本效率评估的运输减碳方案设计",
+      "file": "9beb1ebb04cb85c843ab6d8e408c8cd1.docx"
+    },
+    "order_workbook": {
+      "type": "provided_dataset",
+      "title": "2023年订单数据和运单数据",
+      "file": "订单数据.xlsx"
+    },
+    "vehicle_workbook": {
+      "type": "provided_dataset",
+      "title": "当前所用运输车辆信息",
+      "file": "车辆数据.xlsx"
+    },
+    "mee_2023_grid_factor": {
+      "type": "official_announcement",
+      "title": "关于发布2023年电力二氧化碳排放因子的公告",
+      "issuer": "生态环境部 国家统计局",
+      "announcement_number": "公告2025年第47号",
+      "publication_date": "2025-12-31"
+    }
+  },
+  "fixed_parameters": {
+    "carbon_reduction_target": {
+      "value": 0.7,
+      "unit": "fraction",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "daily_operation_window": {
+      "start": "06:00",
+      "end": "20:00",
+      "hours": 14.0,
+      "unit": "hour",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "winter_months": {
+      "value": [12, 1, 2],
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "electric_winter_range_factor": {
+      "value": 0.7,
+      "unit": "fraction",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "hydrogen_winter_range_factor": {
+      "value": 0.9,
+      "unit": "fraction",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "annual_battery_range_degradation": {
+      "value": 0.05,
+      "unit": "fraction_per_year",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "fast_charge_duration": {
+      "value": 1.5,
+      "unit": "hour",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "fast_charge_target_soc": {
+      "value": 0.8,
+      "unit": "fraction",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "electric_purchase_subsidy": {
+      "value": 20000,
+      "unit": "CNY_per_vehicle",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "hydrogen_purchase_subsidy": {
+      "value": 200000,
+      "unit": "CNY_per_vehicle",
+      "source": "competition_brief",
+      "status": "active"
+    },
+    "national_grid_emission_factor_2023": {
+      "value": 0.5306,
+      "unit": "kgCO2_per_kWh",
+      "source": "mee_2023_grid_factor",
+      "status": "active"
+    }
+  },
+  "interval_parameters": {
+    "existing_diesel_energy_cost": {
+      "minimum": 0.75,
+      "maximum": 1.2,
+      "unit": "CNY_per_km",
+      "source": "competition_brief",
+      "status": "sensitivity_only"
+    },
+    "existing_diesel_annual_maintenance_cost": {
+      "minimum": 15000,
+      "maximum": 40000,
+      "unit": "CNY_per_vehicle_year",
+      "source": "competition_brief",
+      "status": "sensitivity_only"
+    }
+  },
+  "candidate_vehicles": [
+    {
+      "model": "五菱电卡/瑞驰EC35",
+      "energy": "electric",
+      "nominal_range_km": [280, 300],
+      "payload_t": [1.5, 3.0],
+      "purchase_cost_cny": 120000,
+      "energy_cost_cny_per_km": 0.25,
+      "maintenance_cost_cny_per_year": 8000,
+      "source": "competition_brief",
+      "status": "active"
+    },
+    {
+      "model": "比亚迪T5/吉利远程E200",
+      "energy": "electric",
+      "nominal_range_km": [250, 320],
+      "payload_t": [3.0, 5.0],
+      "purchase_cost_cny": 180000,
+      "energy_cost_cny_per_km": 0.35,
+      "maintenance_cost_cny_per_year": 12000,
+      "source": "competition_brief",
+      "status": "active"
+    },
+    {
+      "model": "南京金龙D10/东风凯普特e星",
+      "energy": "electric",
+      "nominal_range_km": [280, 350],
+      "payload_t": [8.0, 10.0],
+      "purchase_cost_cny": 280000,
+      "energy_cost_cny_per_km": 0.48,
+      "maintenance_cost_cny_per_year": 18000,
+      "source": "competition_brief",
+      "status": "active"
+    },
+    {
+      "model": "比亚迪Q3/开沃创源",
+      "energy": "electric",
+      "nominal_range_km": [200, 250],
+      "payload_t": [12.0, 15.0],
+      "purchase_cost_cny": 420000,
+      "energy_cost_cny_per_km": 0.62,
+      "maintenance_cost_cny_per_year": 25000,
+      "source": "competition_brief",
+      "status": "active"
+    },
+    {
+      "model": "佛山飞驰氢能厢货",
+      "energy": "hydrogen",
+      "nominal_range_km": [400, 400],
+      "payload_t": [8.0, 10.0],
+      "purchase_cost_cny": 650000,
+      "energy_cost_cny_per_km": 0.85,
+      "maintenance_cost_cny_per_year": 22000,
+      "source": "competition_brief",
+      "status": "active"
+    },
+    {
+      "model": "上汽红岩氢燃料电池重卡",
+      "energy": "hydrogen",
+      "nominal_range_km": [450, 450],
+      "payload_t": [12.0, 15.0],
+      "purchase_cost_cny": 950000,
+      "energy_cost_cny_per_km": 1.05,
+      "maintenance_cost_cny_per_year": 35000,
+      "source": "competition_brief",
+      "status": "active"
+    }
+  ],
+  "trained_parameters": {
+    "travel_time_statistics": {
+      "values": ["p50", "p90"],
+      "training_source": "order_workbook",
+      "selection_rule": "P50用于中心情景，P90用于稳健主实验",
+      "status": "active"
+    },
+    "vehicle_cost_equivalent_km": {
+      "value": 75.0,
+      "unit": "km_per_vehicle_chain",
+      "training_source": "order_workbook",
+      "training_period": "2023-11",
+      "frozen_test_period": "2023-12",
+      "selection_rule": "在不超过历史P90空驶距离的候选中选择车辆链最少的方案",
+      "status": "active_proxy_only"
+    }
+  },
+  "blocked_parameters": {
+    "existing_vehicle_emission_factors": {
+      "reason": "尚未逐车型核验国家标准或高质量文献来源",
+      "status": "blocked"
+    },
+    "electric_vehicle_energy_consumption_kwh_per_km": {
+      "reason": "赛题只给出单位里程能耗成本，不能在没有电价依据时反推电耗",
+      "status": "blocked"
+    },
+    "hydrogen_consumption_kg_per_km": {
+      "reason": "赛题只给出单位里程能耗成本，不能在没有氢价依据时反推氢耗",
+      "status": "blocked"
+    },
+    "hydrogen_production_emission_factor": {
+      "reason": "需要核验中国氢气供给结构和核算边界一致的权威来源",
+      "status": "blocked"
+    },
+    "loading_rate_targets": {
+      "reason": "订单数据没有车辆容积字段，55%和78%不能作为实测主参数",
+      "status": "blocked"
+    },
+    "empty_running_rate_targets": {
+      "reason": "订单数据没有直接标识空载行程，40%和32%不能作为实测主参数",
+      "status": "blocked"
+    }
+  }
+}
