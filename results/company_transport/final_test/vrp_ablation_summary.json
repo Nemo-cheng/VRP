@@ -1,0 +1,19 @@
+{
+  "source_only": "existing independent December final-test results",
+  "instances": 23,
+  "tasks": 731,
+  "vehicle_cost_equivalent_km": 75.0,
+  "vehicle_cost_parameter_source": "selected on November validation data and frozen before December testing",
+  "families": {
+    "constraint_ablation": "Uses the minimum-vehicles-then-deadhead objective and adds empirical feasibility constraints step by step.",
+    "decision_ablation": "Uses the frozen 75 km proxy where applicable to isolate global optimization, joint type choice and deadhead control."
+  },
+  "key_effects": {
+    "global_optimization_proxy_cost_reduction_rate_vs_greedy": 0.07852724819611699,
+    "joint_type_choice_proxy_cost_reduction_rate_vs_fixed": 0.031591557496968514,
+    "p90_additional_vehicle_chains_vs_p50": 12,
+    "deadhead_control_additional_vehicle_chains": 29,
+    "deadhead_control_reduction_km": 4457.54
+  },
+  "all_variants_feasible": true
+}

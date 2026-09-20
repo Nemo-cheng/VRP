@@ -1,0 +1,10 @@
+﻿instances,tasks,comparison_family,variant,change_from_next_model,objective,vehicle_count,internal_deadhead_distance_km,task_service_rate,constraint_violations,weighted_proxy_cost,proxy_cost_change_vs_full_rate
+23,731,constraint_ablation,one_task_one_vehicle,remove_vehicle_reuse,minimum_vehicles_then_deadhead,731,0.0,1.0,0,,
+23,731,constraint_ablation,basic_vrp,remove_vehicle_type_compatibility,minimum_vehicles_then_deadhead,490,3514.5899999999992,1.0,0,,
+23,731,constraint_ablation,static_type_compatible_vrp,remove_time_dependent_travel,minimum_vehicles_then_deadhead,551,8888.66,1.0,0,,
+23,731,constraint_ablation,p50_time_dependent_vrp,remove_p90_robustness,minimum_vehicles_then_deadhead,553,8932.83,1.0,0,,
+23,731,constraint_ablation,p90_joint_type_vrp,full_strict_model,minimum_vehicles_then_deadhead,565,6308.54,1.0,0,,
+23,731,decision_ablation,chronological_greedy,remove_global_optimization,vehicle_cost_75_km,570,7605.26,1.0,0,50355.26,0.08521928406715377
+23,731,decision_ablation,fixed_type_global_vrp,remove_joint_vehicle_type_choice,vehicle_cost_75_km,614,1864.7,1.0,0,47914.7,0.032622141764186055
+23,731,decision_ablation,p90_joint_type_balanced_vrp,full_balanced_model,vehicle_cost_75_km,594,1850.9999999999998,1.0,0,46401.0,0.0
+23,731,decision_ablation,p90_joint_type_minimum_vehicle_vrp,remove_deadhead_control,minimum_vehicles_then_deadhead,565,6308.54,1.0,0,,
