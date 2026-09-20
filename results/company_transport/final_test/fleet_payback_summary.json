@@ -1,0 +1,30 @@
+{
+  "status": "sensitivity_only",
+  "annualization_factor": 15.869565217391305,
+  "asset_counts_are_lower_bounds": true,
+  "baseline_assets_floor": 78,
+  "plan_assets_floor": 77,
+  "net_new_vehicle_investment_cny": 12000000.0,
+  "gross_new_vehicle_investment_cny": 15820000.0,
+  "annual_operating_cost_saving_cny": {
+    "minimum": 425623.4889130434,
+    "maximum": 2438082.890543478
+  },
+  "simple_payback_years_after_subsidy": {
+    "best_case": 4.921899926595628,
+    "worst_case": 28.193932695410165
+  },
+  "simple_payback_years_before_subsidy": {
+    "best_case": 6.488704736561902,
+    "worst_case": 37.169001270115736
+  },
+  "excluded_parameters": [
+    "discount_rate",
+    "vehicle_service_life",
+    "residual_value",
+    "battery_or_fuel_cell_replacement",
+    "charging_or_hydrogen_station_investment",
+    "carbon_price"
+  ],
+  "interpretation": "简单回收期只用于成本区间敏感性。缺少车辆寿命、折现率、残值和补能基础设施投资时，不能据此形成净现值或最终采购结论。"
+}
