@@ -1,0 +1,16 @@
+{
+  "schedule": "independently_selected_p90_solution",
+  "constraint_source": "competition_brief",
+  "clock_window": "06:00-20:00",
+  "maximum_daily_operating_hours": 14.0,
+  "tasks": 731,
+  "tasks_outside_clock_window": 530,
+  "tasks_outside_clock_window_rate": 0.7250341997264022,
+  "tasks_over_14h": 39,
+  "vehicle_chains": 594,
+  "chains_over_14h": 111,
+  "chains_with_out_of_window_task": 450,
+  "operating_window_compliant_chains": 144,
+  "operating_window_compliant_chain_rate": 0.24242424242424243,
+  "decision": "Only compliant chains may enter vehicle replacement feasibility. Noncompliant tasks require a separate rescheduling model because the dataset has no customer service time windows."
+}
