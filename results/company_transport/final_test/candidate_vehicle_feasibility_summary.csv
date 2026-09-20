@@ -1,0 +1,13 @@
+﻿candidate_id,candidate_model,energy,scenario,evaluated_chains,operating_window_feasible_chains,payload_feasible_chains,range_feasible_chains,technical_feasible_chains,technical_feasible_rate_all_chains,technical_feasible_rate_window_compliant
+candidate_01,五菱电卡/瑞驰EC35,electric,lower_bound,594,144,594,444,136,0.22895622895622897,0.9444444444444444
+candidate_01,五菱电卡/瑞驰EC35,electric,upper_bound,594,144,594,455,140,0.2356902356902357,0.9722222222222222
+candidate_02,比亚迪T5/吉利远程E200,electric,lower_bound,594,144,594,431,135,0.22727272727272727,0.9375
+candidate_02,比亚迪T5/吉利远程E200,electric,upper_bound,594,144,594,480,142,0.23905723905723905,0.9861111111111112
+candidate_03,南京金龙D10/东风凯普特e星,electric,lower_bound,594,144,594,444,136,0.22895622895622897,0.9444444444444444
+candidate_03,南京金龙D10/东风凯普特e星,electric,upper_bound,594,144,594,486,144,0.24242424242424243,1.0
+candidate_04,比亚迪Q3/开沃创源,electric,lower_bound,594,144,594,382,128,0.21548821548821548,0.8888888888888888
+candidate_04,比亚迪Q3/开沃创源,electric,upper_bound,594,144,594,431,135,0.22727272727272727,0.9375
+candidate_05,佛山飞驰氢能厢货,hydrogen,lower_bound,594,144,594,533,144,0.24242424242424243,1.0
+candidate_05,佛山飞驰氢能厢货,hydrogen,upper_bound,594,144,594,533,144,0.24242424242424243,1.0
+candidate_06,上汽红岩氢燃料电池重卡,hydrogen,lower_bound,594,144,594,542,144,0.24242424242424243,1.0
+candidate_06,上汽红岩氢燃料电池重卡,hydrogen,upper_bound,594,144,594,542,144,0.24242424242424243,1.0

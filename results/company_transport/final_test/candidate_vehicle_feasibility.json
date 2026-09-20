@@ -1,0 +1,33 @@
+{
+  "source_only": [
+    "订单数据.xlsx",
+    "车辆数据.xlsx",
+    "competition_brief"
+  ],
+  "route_solution": "independently_selected_p90_solution",
+  "chains": 594,
+  "window_compliant_chains": 144,
+  "scenarios": {
+    "lower_bound": "候选车型载重和标称续航区间下界",
+    "upper_bound": "候选车型载重和标称续航区间上界"
+  },
+  "winter_and_degradation_applied": true,
+  "en_route_recharging_assumed": false,
+  "operating_window_audit": {
+    "schedule": "independently_selected_p90_solution",
+    "constraint_source": "competition_brief",
+    "clock_window": "06:00-20:00",
+    "maximum_daily_operating_hours": 14.0,
+    "tasks": 731,
+    "tasks_outside_clock_window": 530,
+    "tasks_outside_clock_window_rate": 0.7250341997264022,
+    "tasks_over_14h": 39,
+    "vehicle_chains": 594,
+    "chains_over_14h": 111,
+    "chains_with_out_of_window_task": 450,
+    "operating_window_compliant_chains": 144,
+    "operating_window_compliant_chain_rate": 0.24242424242424243,
+    "decision": "Only compliant chains may enter vehicle replacement feasibility. Noncompliant tasks require a separate rescheduling model because the dataset has no customer service time windows."
+  },
+  "decision_scope": "结果只验证载重、无途中补能续航和运营窗口，不包含碳排放与成本排序。"
+}

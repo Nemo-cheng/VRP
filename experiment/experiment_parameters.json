@@ -86,6 +86,13 @@
       "source": "competition_brief",
       "status": "active"
     },
+    "battery_degradation_years_to_2026": {
+      "value": 3,
+      "unit": "year",
+      "source": "competition_brief",
+      "derivation": "以2023年基准年至2026年底目标年计算",
+      "status": "active"
+    },
     "fast_charge_duration": {
       "value": 1.5,
       "unit": "hour",
