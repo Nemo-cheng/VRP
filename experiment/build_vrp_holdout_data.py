@@ -17,7 +17,6 @@ import json
 from pathlib import Path
 
 import pandas as pd
-
 from build_vrp_data_layer import (
     assign_components,
     build_high_confidence_graph,
@@ -34,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="构造 VRP 时间外验证数据。")
     parser.add_argument("--input", type=Path, default=Path("订单数据.xlsx"))
     parser.add_argument("--cutoff", default="2023-10-01")
+    parser.add_argument("--test-end-exclusive", default=None)
     parser.add_argument("--min-edge-observations", type=int, default=10)
     parser.add_argument("--min-period-observations", type=int, default=5)
     parser.add_argument("--min-instance-tasks", type=int, default=10)
@@ -54,11 +54,15 @@ def build_holdout_layer(
     min_period_observations: int,
     min_instance_tasks: int,
     required_instances: int,
+    test_end_exclusive: pd.Timestamp | None = None,
 ) -> dict[str, object]:
     all_tasks = build_tasks(events)
     departure_time = pd.to_datetime(all_tasks["departed_at"])
     train_tasks = all_tasks[departure_time < cutoff].copy()
-    test_tasks = all_tasks[departure_time >= cutoff].copy()
+    test_mask = departure_time >= cutoff
+    if test_end_exclusive is not None:
+        test_mask &= departure_time < test_end_exclusive
+    test_tasks = all_tasks[test_mask].copy()
     edges, periods = build_network_tables(
         train_tasks, min_edge_observations, min_period_observations
     )
@@ -82,8 +86,13 @@ def build_holdout_layer(
         "cutoff": cutoff.strftime("%Y-%m-%d"),
         "train_period_end_exclusive": cutoff.strftime("%Y-%m-%d"),
         "test_period_start_inclusive": cutoff.strftime("%Y-%m-%d"),
-        "train_tasks": int(len(train_tasks)),
-        "test_tasks": int(len(test_tasks)),
+        "test_period_end_exclusive": (
+            test_end_exclusive.strftime("%Y-%m-%d")
+            if test_end_exclusive is not None
+            else None
+        ),
+        "train_tasks": len(train_tasks),
+        "test_tasks": len(test_tasks),
         "network_and_vehicle_type_evidence_from_train_only": True,
     }
     return {
@@ -109,6 +118,7 @@ def main() -> None:
         args.min_period_observations,
         args.min_instance_tasks,
         args.required_instances,
+        pd.Timestamp(args.test_end_exclusive) if args.test_end_exclusive else None,
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.result_dir.mkdir(parents=True, exist_ok=True)
@@ -122,7 +132,9 @@ def main() -> None:
     }
     for filename, frame in outputs.items():
         frame.to_csv(args.output_dir / filename, index=False, encoding="utf-8-sig")
-    public_instances = layer["instances"].drop(columns=["service_date"], errors="ignore")
+    public_instances = layer["instances"].drop(
+        columns=["service_date"], errors="ignore"
+    )
     public_instances.to_csv(
         args.result_dir / "vrp_instance_summary.csv", index=False, encoding="utf-8-sig"
     )
