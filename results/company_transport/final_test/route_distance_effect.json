@@ -1,0 +1,20 @@
+{
+  "tasks": 731,
+  "historical_vehicle_chains": 692,
+  "recommended_vehicle_chains": 594,
+  "vehicle_chain_reduction_rate": 0.1416184971098266,
+  "loaded_distance_km_both_solutions": 103114.34,
+  "historical_deadhead_distance_km": 2345.8500000000004,
+  "recommended_deadhead_distance_km": 1850.9999999999998,
+  "historical_total_distance_km": 105460.19,
+  "recommended_total_distance_km": 104965.34,
+  "total_distance_reduction_km": 494.8500000000058,
+  "total_distance_reduction_rate": 0.004692291944476923,
+  "loaded_distance_changed": false,
+  "deadhead_reduction_95_ci_km": [
+    -581.4802500000002,
+    1910.5482499999998
+  ],
+  "interpretation": "车辆链减少反映所需车辆资产数量变化。载货任务及其里程保持不变，路线可直接归因的运输距离变化只来自内部空驶。",
+  "carbon_inference": "车型排放因子固定时，碳排放变化与总里程变化同方向；车型同时变化时必须另做逐段加权，不能用车辆链减少率代替减排率。"
+}
