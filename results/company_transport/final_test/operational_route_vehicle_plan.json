@@ -1,0 +1,30 @@
+{
+  "scenario": "lower_bound",
+  "route_chains": 594,
+  "candidate_selected_chains": 534,
+  "retained_existing_chains": 60,
+  "observed_route_distance_km": 104965.34,
+  "existing_diesel_energy_cost_cny_per_km": {
+    "minimum": 0.75,
+    "maximum": 1.2,
+    "source": "competition_brief"
+  },
+  "baseline_energy_cost_cny": {
+    "minimum": 78724.005,
+    "maximum": 125958.40800000001
+  },
+  "plan_energy_cost_cny": {
+    "minimum": 67531.292,
+    "maximum": 91925.78749999999
+  },
+  "energy_cost_saving_cny": {
+    "minimum": 11192.713000000003,
+    "maximum": 34032.62050000002
+  },
+  "energy_cost_reduction_rate": {
+    "minimum": 0.14217662071435522,
+    "maximum": 0.2701893509165344
+  },
+  "purchase_and_maintenance_included": false,
+  "decision_scope": "仅比较最终测试观测路线的单位里程能耗成本。购置成本和年维护成本需先确定车辆资产数、使用年限与年行驶里程。"
+}

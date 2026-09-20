@@ -1,0 +1,6 @@
+﻿assignment_status,assigned_energy,assigned_model,route_chains,route_distance_km,plan_energy_cost_cny_min,plan_energy_cost_cny_max
+candidate_selected,electric,五菱电卡/瑞驰EC35,439,27982.86,6995.715,6995.715
+candidate_selected,hydrogen,上汽红岩氢燃料电池重卡,7,2607.34,2737.7070000000003,2737.7070000000003
+candidate_selected,hydrogen,佛山飞驰氢能厢货,88,20165.15,17140.3775,17140.3775
+retain_no_candidate_feasible,diesel,retain_existing_vehicle,18,9770.15,7327.6125,11724.18
+retain_pending_operating_plan,diesel,retain_existing_vehicle,42,44439.84,33329.88,53327.808
