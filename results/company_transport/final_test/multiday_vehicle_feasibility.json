@@ -1,0 +1,19 @@
+{
+  "source_only": [
+    "订单数据.xlsx",
+    "车辆数据.xlsx",
+    "competition_brief"
+  ],
+  "classified_multiday_tasks": 33,
+  "maximum_daily_operating_hours": 14.0,
+  "maximum_hours_source": "competition_brief",
+  "winter_and_degradation_applied": true,
+  "spatial_relay_nodes_created": false,
+  "overnight_replenishment_verified": false,
+  "interpretation": {
+    "time_minimum": "只按14小时运营窗口计算的最少天数。",
+    "conditional_minimum": "假设每日结束后可完全补能时，同时满足14小时和续航的最少天数。",
+    "evidence_limit": "订单数据没有夜间停靠点和补能设施，条件最少天数不能直接视为现实可行方案。"
+  },
+  "decision_scope": "比较候选车型的载重、冬季衰减后续航和跨日运输天数，不包含途中补能选址、碳排放和成本排序。"
+}

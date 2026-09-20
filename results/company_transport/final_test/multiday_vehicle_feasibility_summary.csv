@@ -1,0 +1,13 @@
+﻿candidate_id,candidate_model,energy,scenario,evaluated_tasks,payload_feasible_tasks,end_to_end_range_feasible_tasks,range_feasible_at_time_minimum_tasks,tasks_requiring_additional_days,total_additional_days_due_to_range,maximum_conditional_operating_days,range_feasible_at_time_minimum_rate
+candidate_01,五菱电卡/瑞驰EC35,electric,lower_bound,33,33,0,0,33,204,12,0.0
+candidate_01,五菱电卡/瑞驰EC35,electric,upper_bound,33,33,0,0,33,186,11,0.0
+candidate_02,比亚迪T5/吉利远程E200,electric,lower_bound,33,33,0,0,33,239,13,0.0
+candidate_02,比亚迪T5/吉利远程E200,electric,upper_bound,33,33,0,0,33,170,11,0.0
+candidate_03,南京金龙D10/东风凯普特e星,electric,lower_bound,33,33,0,0,33,204,12,0.0
+candidate_03,南京金龙D10/东风凯普特e星,electric,upper_bound,33,33,0,0,33,151,10,0.0
+candidate_04,比亚迪Q3/开沃创源,electric,lower_bound,33,33,0,0,33,301,17,0.0
+candidate_04,比亚迪Q3/开沃创源,electric,upper_bound,33,33,0,0,33,239,13,0.0
+candidate_05,佛山飞驰氢能厢货,hydrogen,lower_bound,33,33,0,4,29,66,6,0.12121212121212122
+candidate_05,佛山飞驰氢能厢货,hydrogen,upper_bound,33,33,0,4,29,66,6,0.12121212121212122
+candidate_06,上汽红岩氢燃料电池重卡,hydrogen,lower_bound,33,33,0,7,26,53,5,0.21212121212121213
+candidate_06,上汽红岩氢燃料电池重卡,hydrogen,upper_bound,33,33,0,7,26,53,5,0.21212121212121213
