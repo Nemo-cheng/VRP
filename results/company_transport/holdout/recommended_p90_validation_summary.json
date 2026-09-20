@@ -1,0 +1,32 @@
+{
+  "source_only": "订单数据.xlsx",
+  "solution": "P90 vehicle cost equivalent to 89 km of deadhead",
+  "instances": 34,
+  "tasks": 1070,
+  "historical_vehicle_chain_count": 1013,
+  "recommended_vehicle_count": 861,
+  "aggregate_vehicle_reduction": 152,
+  "aggregate_vehicle_reduction_rate": 0.15004935834155972,
+  "historical_deadhead_distance_km": 3463.15,
+  "recommended_deadhead_distance_km": 3455.4399999999996,
+  "aggregate_deadhead_reduction_km": 7.710000000000491,
+  "instances_with_vehicle_reduction": 34,
+  "instances_with_equal_vehicle_count": 0,
+  "instances_with_vehicle_increase": 0,
+  "instances_with_no_deadhead_increase": 11,
+  "instances_with_deadhead_increase": 23,
+  "instances_with_both_vehicle_and_deadhead_improvement": 11,
+  "median_instance_vehicle_reduction_rate": 0.17206290471785385,
+  "bootstrap_samples": 10000,
+  "bootstrap_random_seed": 20260920,
+  "aggregate_vehicle_reduction_rate_95_ci": [
+    0.12677201658659212,
+    0.17941968287232835
+  ],
+  "aggregate_deadhead_reduction_km_95_ci": [
+    -1125.9494999999997,
+    1250.51
+  ],
+  "inference_scope": "Intervals describe variation across the 34 holdout instances. The 89 km setting was selected on the same holdout and is not an independent confirmatory estimate.",
+  "result_interpretation": "Vehicle reduction is consistent across instances. Aggregate deadhead is approximately unchanged, while instance-level deadhead changes are heterogeneous."
+}
