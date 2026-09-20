@@ -1,0 +1,32 @@
+{
+  "asset_sizing_method": "sum_of_component_level_daily_peaks_by_fleet_type",
+  "observed_active_service_days": 23,
+  "new_energy_assets": 65,
+  "retained_existing_assets_floor": 12,
+  "all_diesel_baseline_assets_floor": 78,
+  "gross_new_vehicle_purchase_cost_cny": 15820000.0,
+  "purchase_subsidy_cny": 3820000.0,
+  "net_new_vehicle_purchase_cost_cny": 12000000.0,
+  "annual_maintenance_cost_cny": {
+    "minimum": 922000.0,
+    "maximum": 1222000.0
+  },
+  "observed_period_energy_cost_cny": {
+    "minimum": 67531.292,
+    "maximum": 91925.7875
+  },
+  "annualized_sensitivity": {
+    "status": "sensitivity_only",
+    "factor": 15.869565217391305,
+    "assumption": "23个测试活跃日的日均路线需求可代表全年活跃日。",
+    "energy_cost_cny": {
+      "minimum": 1071692.2426086958,
+      "maximum": 1458822.2798913044
+    },
+    "first_year_cost_cny": {
+      "minimum": 13993692.242608696,
+      "maximum": 14680822.279891305
+    }
+  },
+  "asset_count_limit": "新能源路线均可重排进单日14小时窗口，其资产数按每日峰值计算。保留柴油路线含跨日和时间异常任务，其资产数及全柴油对照均为下界。"
+}
