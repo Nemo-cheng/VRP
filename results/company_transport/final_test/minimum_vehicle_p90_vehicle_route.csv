@@ -1,0 +1,5 @@
+﻿task_label,sequence,vehicle_type_name,origin_site_id,destination_site_id,loaded_path,distance_km,departure_offset_hours,arrival_offset_hours,next_task_label,deadhead_to_next_path,deadhead_to_next_distance_km,deadhead_to_next_duration_hours,waiting_after_deadhead_hours
+task_01,1,4.2米厢式货车,site_0164,site_0237,site_0164>site_0237,10.53,0.0,1.2033333333333334,task_02,site_0237>site_0255>site_2125>site_0164,120.5,4.053305555555555,5.458083333333056
+task_02,2,4.2米厢式货车,site_0164,site_0237,site_0164>site_0237,10.53,10.714722222222223,11.045833333333333,task_03,site_0237,0.0,0.0,3.8780555555555556
+task_03,3,4.2米厢式货车,site_0237,site_0255,site_0237>site_0255,8.52,14.92388888888889,15.067777777777778,task_04,site_0255,0.0,0.0,3.5441666666666665
+task_04,4,4.2米厢式货车,site_0255,site_2125,site_0255>site_2125,58.12,18.611944444444443,19.838333333333335,,,0.0,0.0,

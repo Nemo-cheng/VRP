@@ -1,0 +1,3 @@
+﻿solution,decision_role,vehicle_count,internal_deadhead_distance_km,vehicle_reduction_vs_history,deadhead_reduction_vs_history_km,task_service_rate,constraint_violations
+minimum_vehicle_p90,vehicle compression bound,565,6308.54,127,-3962.69,1.0,0
+historical_deadhead_controlled_p90,historical deadhead controlled compromise,594,1850.9999999999998,98,494.85000000000014,1.0,0
