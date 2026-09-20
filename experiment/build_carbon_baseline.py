@@ -186,6 +186,10 @@ def build_baseline(
     covered = eligible[eligible["coverage_status"] == "covered"]
     total_distance = float(eligible["distance_km"].sum())
     covered_distance = float(covered["distance_km"].sum())
+    service_dates = eligible["departed_at"].dt.normalize()
+    active_service_days = int(service_dates.nunique())
+    annualization_factor = 365 / active_service_days
+    observed_covered_emissions = float(covered["emissions_kgco2"].sum() / 1000)
     uncovered = (
         eligible[eligible["coverage_status"] != "covered"]
         .groupby("coverage_status", as_index=False)
@@ -195,7 +199,12 @@ def build_baseline(
         )
     )
     summary = {
-        "source_period": "2023-01-01/2023-12-31",
+        "observed_date_min": str(service_dates.min().date()),
+        "observed_date_max": str(service_dates.max().date()),
+        "observed_months": sorted(
+            eligible["departed_at"].dt.to_period("M").astype(str).unique()
+        ),
+        "active_service_days": active_service_days,
         "annualization_applied": False,
         "method_source": "hubei_transport_carbon_guide_2024",
         "eligible_physical_legs": len(eligible),
@@ -203,14 +212,21 @@ def build_baseline(
         "covered_physical_legs": len(covered),
         "covered_distance_km": covered_distance,
         "covered_distance_share": covered_distance / total_distance,
-        "covered_emissions_tco2": float(
-            covered["emissions_kgco2"].sum() / 1000
-        ),
+        "observed_covered_emissions_tco2": observed_covered_emissions,
+        "annualization_sensitivity": {
+            "status": "sensitivity_only",
+            "method": "observed covered emissions * 365 / active service days",
+            "factor": annualization_factor,
+            "covered_emissions_tco2": (
+                observed_covered_emissions * annualization_factor
+            ),
+            "assumption": "观测活跃日的运输强度可代表全年，赛题未直接保证该假设。",
+        },
         "is_complete_2023_baseline": len(covered) == len(eligible),
         "uncovered": uncovered.to_dict(orient="records"),
         "interpretation": (
-            "covered_emissions_tco2仅表示官方缺省参数覆盖的运输段，"
-            "不能作为完整2023年总排放。"
+            "observed_covered_emissions_tco2仅表示观测活跃日内由官方缺省参数"
+            "覆盖的运输段。年化值只用于敏感性分析，两者均不能作为完整2023年总排放。"
         ),
     }
     return eligible, by_group, summary
