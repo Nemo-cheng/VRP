@@ -14,15 +14,36 @@ from __future__ import annotations
 
 import argparse
 import json
+from itertools import pairwise
 from pathlib import Path
 
 import networkx as nx
 import pandas as pd
-
 from prepare_excel_transport_data import build_transport_events, load_data
 
 PERIOD_BINS = [-1, 5, 9, 15, 19, 23]
 PERIOD_LABELS = ["night", "morning_peak", "daytime", "evening_peak", "evening"]
+INSTANCE_COLUMNS = [
+    "instance_id",
+    "service_date",
+    "component_id",
+    "task_count",
+    "linkable_task_count",
+    "candidate_link_count",
+    "origin_site_count",
+    "destination_site_count",
+    "historical_vehicle_count",
+    "qualifies_for_vrp",
+]
+LINK_COLUMNS = [
+    "instance_id",
+    "from_task_id",
+    "to_task_id",
+    "deadhead_duration_hours_p50",
+    "deadhead_distance_km",
+    "deadhead_path",
+    "available_slack_hours",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -32,7 +53,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-period-observations", type=int, default=5)
     parser.add_argument("--min-instance-tasks", type=int, default=10)
     parser.add_argument("--required-instances", type=int, default=20)
-    parser.add_argument("--output-dir", type=Path, default=Path("processed/company/vrp"))
+    parser.add_argument(
+        "--output-dir", type=Path, default=Path("processed/company/vrp")
+    )
     parser.add_argument(
         "--result-dir", type=Path, default=Path("results/company_transport")
     )
@@ -123,14 +146,18 @@ def build_high_confidence_graph(edges: pd.DataFrame) -> nx.DiGraph:
 def assign_components(tasks: pd.DataFrame, graph: nx.DiGraph) -> pd.DataFrame:
     component_map: dict[str, str] = {}
     undirected = graph.to_undirected()
-    components = sorted(nx.connected_components(undirected), key=lambda nodes: min(nodes))
+    components = sorted(
+        nx.connected_components(undirected), key=lambda nodes: min(nodes)
+    )
     for index, nodes in enumerate(components, start=1):
         component_id = f"component_{index:04d}"
         component_map.update({node: component_id for node in nodes})
 
     assigned = tasks.copy()
     assigned["origin_component"] = assigned["origin_site_id"].map(component_map)
-    assigned["destination_component"] = assigned["destination_site_id"].map(component_map)
+    assigned["destination_component"] = assigned["destination_site_id"].map(
+        component_map
+    )
     assigned["network_covered"] = (
         assigned["origin_component"].notna()
         & assigned["origin_component"].eq(assigned["destination_component"])
@@ -161,7 +188,7 @@ def deadhead_route_lookup(
         for destination, path in paths.items():
             distance = sum(
                 float(graph.edges[start, end]["distance_km"])
-                for start, end in zip(path, path[1:])
+                for start, end in pairwise(path)
             )
             lookup[origin][destination] = (
                 float(durations[destination]),
@@ -234,7 +261,10 @@ def build_instances(
             }
         )
 
-    return pd.DataFrame(instance_rows), pd.DataFrame(link_rows)
+    return (
+        pd.DataFrame(instance_rows, columns=INSTANCE_COLUMNS),
+        pd.DataFrame(link_rows, columns=LINK_COLUMNS),
+    )
 
 
 def build_readiness_report(
@@ -267,23 +297,23 @@ def build_readiness_report(
             "required_independent_instances": required_instances,
         },
         "tasks": {
-            "eligible_tasks": int(len(tasks)),
+            "eligible_tasks": len(tasks),
             "required_field_complete_share": complete_share,
             "network_covered_tasks": int(tasks["network_covered"].sum()),
             "network_coverage_share": float(tasks["network_covered"].mean()),
         },
         "network": {
-            "directed_edges": int(len(edges)),
+            "directed_edges": len(edges),
             "high_confidence_edges": int(edges["high_confidence"].sum()),
-            "period_cells": int(len(periods)),
+            "period_cells": len(periods),
             "reliable_period_cells": int(periods["period_estimate_available"].sum()),
         },
         "instances": {
-            "date_component_instances": int(len(instances)),
-            "qualified_instances": int(len(qualified)),
+            "date_component_instances": len(instances),
+            "qualified_instances": len(qualified),
             "qualified_tasks": int(qualified["task_count"].sum()),
             "qualified_linkable_tasks": int(qualified["linkable_task_count"].sum()),
-            "candidate_task_links": int(len(links)),
+            "candidate_task_links": len(links),
             "largest_instance_tasks": int(instances["task_count"].max())
             if not instances.empty
             else 0,
@@ -334,14 +364,18 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.result_dir.mkdir(parents=True, exist_ok=True)
     tasks.to_csv(args.output_dir / "tasks.csv", index=False, encoding="utf-8-sig")
-    edges.to_csv(args.output_dir / "network_edges.csv", index=False, encoding="utf-8-sig")
+    edges.to_csv(
+        args.output_dir / "network_edges.csv", index=False, encoding="utf-8-sig"
+    )
     periods.to_csv(
         args.output_dir / "edge_period_stats.csv", index=False, encoding="utf-8-sig"
     )
     lane_vehicle_types.to_csv(
         args.output_dir / "lane_vehicle_types.csv", index=False, encoding="utf-8-sig"
     )
-    instances.to_csv(args.output_dir / "instances.csv", index=False, encoding="utf-8-sig")
+    instances.to_csv(
+        args.output_dir / "instances.csv", index=False, encoding="utf-8-sig"
+    )
     links.to_csv(
         args.output_dir / "candidate_task_links.csv", index=False, encoding="utf-8-sig"
     )

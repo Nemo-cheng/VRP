@@ -1,6 +1,5 @@
 import networkx as nx
 import pandas as pd
-
 from build_vrp_data_layer import (
     assign_components,
     build_instances,
@@ -37,7 +36,9 @@ def test_builds_high_confidence_edges_and_periods() -> None:
     tasks = build_tasks(sample_events())
     edges, periods = build_network_tables(tasks, 2, 2)
 
-    edge_ab = edges.query("origin_site_id == 'A' and destination_site_id == 'B'").iloc[0]
+    edge_ab = edges.query("origin_site_id == 'A' and destination_site_id == 'B'").iloc[
+        0
+    ]
     assert edge_ab["observations"] == 2
     assert bool(edge_ab["high_confidence"])
     assert periods["period_estimate_available"].sum() == 0
@@ -66,8 +67,18 @@ def test_builds_explicit_lane_vehicle_type_evidence() -> None:
 
     lane_types = build_lane_vehicle_types(tasks)
 
-    lane_ab = lane_types.query(
-        "origin_site_id == 'A' and destination_site_id == 'B'"
-    )
+    lane_ab = lane_types.query("origin_site_id == 'A' and destination_site_id == 'B'")
     assert set(lane_ab["vehicle_type_name"]) == {"type1", "type2"}
     assert lane_ab["observations"].sum() == 2
+
+
+def test_empty_instance_result_keeps_output_schema() -> None:
+    tasks = build_tasks(sample_events())
+    tasks = assign_components(tasks, nx.DiGraph())
+
+    instances, links = build_instances(tasks, nx.DiGraph(), min_instance_tasks=2)
+
+    assert instances.empty
+    assert links.empty
+    assert "qualifies_for_vrp" in instances.columns
+    assert "deadhead_distance_km" in links.columns
