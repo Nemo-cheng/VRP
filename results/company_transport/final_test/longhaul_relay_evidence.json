@@ -1,0 +1,27 @@
+{
+  "source_only": "订单数据.xlsx",
+  "training_network_only": true,
+  "target_longhaul_tasks": 26,
+  "maximum_candidate_effective_range_km": 405.0,
+  "maximum_segment_hours": 14.0,
+  "maximum_segment_hours_source": "competition_brief",
+  "high_confidence_alternative_topology_tasks": 0,
+  "all_observed_alternative_topology_tasks_sensitivity": 17,
+  "verified_relay_feasible_tasks": 0,
+  "all_observed_relay_feasible_tasks_sensitivity": 0,
+  "target_task_emissions_tco2": {
+    "minimum": 28.642571143867332,
+    "maximum": 29.85976451979932
+  },
+  "verified_relay_unlocked_emissions_tco2": {
+    "minimum": 0.0,
+    "maximum": 0.0
+  },
+  "zero_emission_reduction_bound_after_verified_relay": {
+    "minimum": 0.4844100638122302,
+    "maximum": 0.5015896334402227
+  },
+  "transfer_time_available": false,
+  "relay_handling_capacity_available": false,
+  "decision": "只有训练期高置信网络中每段同时满足续航和14小时约束的路径才能进入主方案。低频历史线路仅用于敏感性诊断。"
+}
