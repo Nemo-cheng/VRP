@@ -1,0 +1,15 @@
+﻿scenario,analysis_layer,replacement_outcome,chains,route_distance_km,emissions_tco2_min,emissions_tco2_max
+lower_bound,aggregate_shift_overrun,operating_plan_pending,3,1051.6399999999999,0.8123309935991546,0.8123309935991546
+lower_bound,deferred_time_anomaly,evidence_pending,6,559.74,0.4323667323011589,0.4323667323011589
+lower_bound,multiday_task,additional_days_or_retain_conventional,26,37710.0,28.642571143867336,29.859764519799324
+lower_bound,multiday_task,conditional_hydrogen_with_overnight_replenishment,7,5118.46,4.3521187552717615,4.3521187552717615
+lower_bound,single_day_chain,direct_electric,439,27982.86,15.100493022692927,17.904984010541742
+lower_bound,single_day_chain,hydrogen_only,95,22772.49,15.633777313729494,16.761110508010393
+lower_bound,single_day_chain,retain_conventional_or_change_plan,18,9770.15,7.45751494929455,7.666438673710529
+upper_bound,aggregate_shift_overrun,operating_plan_pending,3,1051.6399999999999,0.8123309935991546,0.8123309935991546
+upper_bound,deferred_time_anomaly,evidence_pending,6,559.74,0.4323667323011589,0.4323667323011589
+upper_bound,multiday_task,additional_days_or_retain_conventional,26,37710.0,28.642571143867336,29.859764519799324
+upper_bound,multiday_task,conditional_hydrogen_with_overnight_replenishment,7,5118.46,4.3521187552717615,4.3521187552717615
+upper_bound,single_day_chain,direct_electric,480,35512.15,19.144011414061016,22.739283181052095
+upper_bound,single_day_chain,hydrogen_only,54,15243.2,11.5902589223614,11.926811337500041
+upper_bound,single_day_chain,retain_conventional_or_change_plan,18,9770.15,7.45751494929455,7.666438673710529
