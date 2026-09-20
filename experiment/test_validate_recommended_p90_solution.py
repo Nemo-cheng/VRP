@@ -53,9 +53,17 @@ def test_summary_counts_instance_outcomes() -> None:
     schedule, chains, links = make_data()
     comparison = build_instance_comparison(schedule, chains, links)
 
-    summary = summarize_validation(comparison, samples=100, seed=7)
+    summary = summarize_validation(
+        comparison,
+        samples=100,
+        seed=7,
+        solution_label="frozen validation choice",
+        independent_final_test=True,
+    )
 
     assert summary["instances"] == 2
+    assert summary["solution"] == "frozen validation choice"
+    assert "independent final-test estimate" in summary["inference_scope"]
     assert summary["historical_vehicle_chain_count"] == 3
     assert summary["recommended_vehicle_count"] == 2
     assert summary["instances_with_vehicle_reduction"] == 1

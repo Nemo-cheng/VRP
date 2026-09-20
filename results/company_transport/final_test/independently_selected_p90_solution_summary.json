@@ -1,0 +1,23 @@
+{
+  "source_only": "订单数据.xlsx",
+  "protocol": "Frozen parameter selected before final-test evaluation.",
+  "travel_time_stat": "p90",
+  "vehicle_cost_equivalent_km": 75.0,
+  "parameter_selection_period": "2023-11",
+  "instances": 23,
+  "tasks": 731,
+  "historical_p90_chain_vehicle_count": 692,
+  "recommended_vehicle_count": 594,
+  "vehicle_reduction": 98,
+  "vehicle_reduction_rate": 0.1416184971098266,
+  "historical_p90_chain_deadhead_distance_km": 2345.85,
+  "recommended_deadhead_distance_km": 1850.9999999999998,
+  "deadhead_reduction_km": 494.85000000000014,
+  "task_service_rate": 1.0,
+  "route_type_violations": 0,
+  "time_overlap_violations": 0,
+  "deadhead_endpoint_violations": 0,
+  "missing_selected_link_paths": 0,
+  "all_instances_solved": true,
+  "no_final_test_parameter_reselection": true
+}

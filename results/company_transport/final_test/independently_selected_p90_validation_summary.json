@@ -1,0 +1,32 @@
+{
+  "source_only": "订单数据.xlsx",
+  "solution": "p90_vehicle_cost_75_km_selected_on_2023_11",
+  "instances": 23,
+  "tasks": 731,
+  "historical_vehicle_chain_count": 692,
+  "recommended_vehicle_count": 594,
+  "aggregate_vehicle_reduction": 98,
+  "aggregate_vehicle_reduction_rate": 0.1416184971098266,
+  "historical_deadhead_distance_km": 2345.8500000000004,
+  "recommended_deadhead_distance_km": 1850.9999999999998,
+  "aggregate_deadhead_reduction_km": 494.8500000000006,
+  "instances_with_vehicle_reduction": 22,
+  "instances_with_equal_vehicle_count": 1,
+  "instances_with_vehicle_increase": 0,
+  "instances_with_no_deadhead_increase": 10,
+  "instances_with_deadhead_increase": 13,
+  "instances_with_both_vehicle_and_deadhead_improvement": 9,
+  "median_instance_vehicle_reduction_rate": 0.17647058823529413,
+  "bootstrap_samples": 10000,
+  "bootstrap_random_seed": 20260920,
+  "aggregate_vehicle_reduction_rate_95_ci": [
+    0.10966041881264842,
+    0.1839532640401728
+  ],
+  "aggregate_deadhead_reduction_km_95_ci": [
+    -581.4802500000002,
+    1910.5482499999998
+  ],
+  "inference_scope": "Intervals describe variation across the 23 evaluation instances. Parameter selection used an earlier period, so this is an independent final-test estimate.",
+  "result_interpretation": "Vehicle reduction is consistent across instances. Aggregate deadhead is approximately unchanged, while instance-level deadhead changes are heterogeneous."
+}

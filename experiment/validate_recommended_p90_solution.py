@@ -34,6 +34,15 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--bootstrap-samples", type=int, default=10_000)
     parser.add_argument("--random-seed", type=int, default=20260920)
+    parser.add_argument(
+        "--schedule-filename", default="recommended_p90_vrp_schedules.csv"
+    )
+    parser.add_argument("--output-prefix", default="recommended_p90_validation")
+    parser.add_argument(
+        "--solution-label",
+        default="P90 vehicle cost equivalent to 89 km of deadhead",
+    )
+    parser.add_argument("--independent-final-test", action="store_true")
     return parser.parse_args()
 
 
@@ -135,6 +144,8 @@ def summarize_validation(
     comparison: pd.DataFrame,
     samples: int = 10_000,
     seed: int = 20260920,
+    solution_label: str = "P90 vehicle cost equivalent to 89 km of deadhead",
+    independent_final_test: bool = False,
 ) -> dict[str, object]:
     historical_vehicles = int(comparison["historical_vehicle_chain_count"].sum())
     recommended_vehicles = int(comparison["recommended_vehicle_count"].sum())
@@ -143,7 +154,7 @@ def summarize_validation(
     intervals = bootstrap_intervals(comparison, samples, seed)
     return {
         "source_only": "订单数据.xlsx",
-        "solution": "P90 vehicle cost equivalent to 89 km of deadhead",
+        "solution": solution_label,
         "instances": len(comparison),
         "tasks": int(comparison["task_count"].sum()),
         "historical_vehicle_chain_count": historical_vehicles,
@@ -177,9 +188,15 @@ def summarize_validation(
         "bootstrap_random_seed": seed,
         **intervals,
         "inference_scope": (
-            "Intervals describe variation across the 34 holdout instances. "
-            "The 89 km setting was selected on the same holdout and is not an "
-            "independent confirmatory estimate."
+            f"Intervals describe variation across the {len(comparison)} "
+            "evaluation instances. Parameter selection used an earlier period, "
+            "so this is an independent final-test estimate."
+            if independent_final_test
+            else (
+                f"Intervals describe variation across the {len(comparison)} "
+                "holdout instances. The parameter was selected on the same "
+                "holdout and is not an independent confirmatory estimate."
+            )
         ),
         "result_interpretation": (
             "Vehicle reduction is consistent across instances. Aggregate "
@@ -191,17 +208,23 @@ def summarize_validation(
 
 def main() -> None:
     args = parse_args()
-    schedule = pd.read_csv(args.data_dir / "recommended_p90_vrp_schedules.csv")
+    schedule = pd.read_csv(args.data_dir / args.schedule_filename)
     chains = pd.read_csv(args.data_dir / "historical_vehicle_chains.csv")
     links = pd.read_csv(args.data_dir / "robust_p90_candidate_task_links.csv")
     comparison = build_instance_comparison(schedule, chains, links)
-    summary = summarize_validation(comparison, args.bootstrap_samples, args.random_seed)
+    summary = summarize_validation(
+        comparison,
+        args.bootstrap_samples,
+        args.random_seed,
+        args.solution_label,
+        args.independent_final_test,
+    )
     comparison.to_csv(
-        args.result_dir / "recommended_p90_instance_validation.csv",
+        args.result_dir / f"{args.output_prefix}_instances.csv",
         index=False,
         encoding="utf-8-sig",
     )
-    (args.result_dir / "recommended_p90_validation_summary.json").write_text(
+    (args.result_dir / f"{args.output_prefix}_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2))

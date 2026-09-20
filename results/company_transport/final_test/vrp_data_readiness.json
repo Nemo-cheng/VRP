@@ -1,0 +1,46 @@
+{
+  "source_only": "订单数据.xlsx",
+  "thresholds": {
+    "min_edge_observations": 10,
+    "min_period_observations": 5,
+    "min_linkable_tasks_per_instance": 10,
+    "required_independent_instances": 20
+  },
+  "tasks": {
+    "eligible_tasks": 1988,
+    "required_field_complete_share": 1.0,
+    "network_covered_tasks": 827,
+    "network_coverage_share": 0.41599597585513076
+  },
+  "network": {
+    "directed_edges": 2686,
+    "high_confidence_edges": 164,
+    "period_cells": 3483,
+    "reliable_period_cells": 405
+  },
+  "instances": {
+    "date_component_instances": 31,
+    "qualified_instances": 23,
+    "qualified_tasks": 731,
+    "qualified_linkable_tasks": 500,
+    "candidate_task_links": 1586,
+    "largest_instance_tasks": 81,
+    "largest_instance_linkable_tasks": 48
+  },
+  "gate_checks": {
+    "task_fields_complete": true,
+    "enough_independent_instances": true,
+    "every_qualified_instance_meets_task_threshold": true
+  },
+  "ready_for_basic_vrp_comparison": true,
+  "validation_protocol": {
+    "split": "chronological",
+    "cutoff": "2023-12-01",
+    "train_period_end_exclusive": "2023-12-01",
+    "test_period_start_inclusive": "2023-12-01",
+    "test_period_end_exclusive": null,
+    "train_tasks": 8987,
+    "test_tasks": 1988,
+    "network_and_vehicle_type_evidence_from_train_only": true
+  }
+}

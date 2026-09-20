@@ -1,0 +1,22 @@
+{
+  "source_only": "订单数据.xlsx",
+  "comparison": "Static type-compatible VRP versus time-dependent type-compatible VRP on the same candidate paths.",
+  "static_candidate_links": 663,
+  "time_feasible_candidate_links": 660,
+  "links_removed_by_time_dependence": 3,
+  "deadhead_edge_traversals": 820,
+  "reliable_period_edge_uses": 339,
+  "travel_time_stat": "p50",
+  "instances": 11,
+  "tasks": 415,
+  "static_type_compatible_vehicle_count": 335,
+  "time_dependent_vehicle_count": 336,
+  "vehicles_added_by_time_dependence": 1,
+  "internal_deadhead_distance_km": 2189.16,
+  "task_service_rate": 1.0,
+  "route_type_violations": 0,
+  "time_overlap_violations": 0,
+  "deadhead_endpoint_violations": 0,
+  "missing_selected_link_paths": 0,
+  "all_instances_solved": true
+}

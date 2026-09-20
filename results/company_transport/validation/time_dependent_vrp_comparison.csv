@@ -1,0 +1,12 @@
+﻿instance_id,task_count,static_type_compatible_vehicle_count,time_dependent_vehicle_count,vehicles_added_by_time_dependence,selected_task_links,internal_deadhead_distance_km,task_service_rate,duplicate_task_assignments,route_type_violations,time_overlap_violations,deadhead_endpoint_violations,missing_selected_link_paths,solver_success,optimality_gap
+instance_00001,10,7,7,0,3,16.0,1.0,0,0,0,0,0,True,0.0
+instance_00003,16,11,11,0,5,19.05,1.0,0,0,0,0,0,True,0.0
+instance_00015,14,10,10,0,4,19.05,1.0,0,0,0,0,0,True,0.0
+instance_00016,13,8,8,0,5,27.57,1.0,0,0,0,0,0,True,0.0
+instance_00024,24,20,20,0,4,162.89,1.0,0,0,0,0,0,True,0.0
+instance_00025,50,43,44,1,6,75.05,1.0,0,0,0,0,0,True,0.0
+instance_00026,57,48,48,0,9,254.54000000000002,1.0,0,0,0,0,0,True,0.0
+instance_00027,62,48,48,0,14,504.69000000000005,1.0,0,0,0,0,0,True,0.0
+instance_00028,52,44,44,0,8,173.11,1.0,0,0,0,0,0,True,0.0
+instance_00029,59,47,47,0,12,559.16,1.0,0,0,0,0,0,True,0.0
+instance_00030,58,49,49,0,9,378.04999999999995,1.0,0,0,0,0,0,True,0.0
