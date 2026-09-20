@@ -1,0 +1,39 @@
+{
+  "source_only": "订单数据.xlsx",
+  "comparison": "Fixed observed task vehicle types versus joint empirical-compatible vehicle-type and route optimization on the independent December test.",
+  "travel_time_stat": "p90",
+  "vehicle_type_scope": "Joint choices are restricted to vehicle types observed on the same directed lane in training data.",
+  "minimum_vehicles_then_deadhead": {
+    "objective": "minimum_vehicles_then_deadhead",
+    "tasks": 731,
+    "instances": 23,
+    "fixed_historical_type_vehicle_count": 585,
+    "joint_type_route_vehicle_count": 565,
+    "joint_vehicle_reduction": 20,
+    "fixed_historical_type_deadhead_distance_km": 5889.53,
+    "joint_type_route_deadhead_distance_km": 6308.54,
+    "joint_deadhead_reduction_km": -419.0100000000002,
+    "instances_where_joint_uses_fewer_vehicles": 16,
+    "instances_where_vehicle_count_is_equal": 7,
+    "instances_where_joint_uses_more_vehicles": 0,
+    "both_solutions_feasible": true
+  },
+  "vehicle_cost_75_km": {
+    "objective": "vehicle_cost_75_km",
+    "tasks": 731,
+    "instances": 23,
+    "fixed_historical_type_vehicle_count": 614,
+    "joint_type_route_vehicle_count": 594,
+    "joint_vehicle_reduction": 20,
+    "fixed_historical_type_deadhead_distance_km": 1864.7,
+    "joint_type_route_deadhead_distance_km": 1850.9999999999998,
+    "joint_deadhead_reduction_km": 13.700000000000273,
+    "instances_where_joint_uses_fewer_vehicles": 16,
+    "instances_where_vehicle_count_is_equal": 7,
+    "instances_where_joint_uses_more_vehicles": 0,
+    "both_solutions_feasible": true,
+    "fixed_weighted_proxy_cost": 47914.7,
+    "joint_weighted_proxy_cost": 46401.0,
+    "joint_weighted_proxy_cost_reduction_rate": 0.031591557496968514
+  }
+}
